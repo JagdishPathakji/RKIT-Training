@@ -1,0 +1,100 @@
+<!-- Tables in HTML are used to display data in rows and columns. They are best suited for tabular data such as student marks, employee details, product lists, timetables, invoices, etc. -->
+
+<!-- <table> → Creates the table
+<tr> → Creates a row
+<th> → Creates a header cell
+<td> → Creates a data cell -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+    <table border="1">
+
+        <tr>
+            <td>Roll No</td>
+            <td>Name</td>
+            <td>Marks</td>
+        </tr>
+
+        <tr>
+            <td>101</td>
+            <td>Amit</td>
+            <td>89</td>
+        </tr>
+
+        <tr>
+            <td>102</td>
+            <td>Priya</td>
+            <td>94</td>
+        </tr>
+
+    </table>
+
+    <!-- Normally, One cell occupies one row.
+    Sometimes we want one cell to occupy multiple rows.
+    For this we use: rowspan -->
+
+    <table border="1">
+
+        <tr>
+            <th>Name</th>
+            <th>Subject</th>
+        </tr>
+
+        <tr>
+            <td rowspan="2">Amit</td>
+            <td>Math</td>
+        </tr>
+
+        <tr>
+            <td>Science</td>
+        </tr>
+
+    </table>
+
+    <!-- 
+    Normally, One cell occupies one column.
+    To merge multiple columns Use : colspan -->
+
+    <table border="1">
+
+        <tr>
+            <th colspan="2">Student Information</th>
+        </tr>
+
+        <tr>
+            <td>Name</td>
+            <td>Amit</td>
+        </tr>
+    </table>
+
+    <!-- Rowspan and Colspan -->
+    <table border="1">
+        <!-- A caption gives the table a title. -->
+        <caption>Student Marks</caption>
+        <tr>
+            <th rowspan="2">Name</th>
+            <th colspan="2">Marks</th>
+        </tr>
+
+        <tr>
+            <th>Math</th>
+            <th>Science</th>
+        </tr>
+
+        <tr>
+            <td>Amit</td>
+            <td>90</td>
+            <td>95</td>
+        </tr>
+
+    </table>
+
+</body>
+</html>
