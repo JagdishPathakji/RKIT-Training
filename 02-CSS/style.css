@@ -1,0 +1,222 @@
+/* universal selector */
+* {
+    margin: 0;
+    padding: 0;
+    /* Forces the browser to include an element's padding and border within its total specified width and height */
+    box-sizing: border-box;
+}
+
+/* element selector */
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f5f5f5;
+    color: #333;
+    line-height: 1.5;
+}
+
+/* class selector */
+.container {
+    /* Sets the container's width to 90% of the screen. */
+    width: 90%;
+    /* Caps the container's width at exactly 1200 pixels. */
+    max-width: 1200px;
+    /* Centers the container horizontally. */
+    margin: auto;
+}
+
+.btn {
+    background: royalblue;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    cursor: pointer;
+}
+
+/* id selector */
+#hero {
+    background: white;
+    padding: 80px 0;
+}
+
+/* group selector */
+h1,h2,h3 {
+    color: #222;
+}
+
+/* descendant selector */
+/* Targets ALL matching descendants. */
+nav a {
+    text-decoration: none;
+    color: black;
+}
+
+/* child selector */
+/* Only direct children. */
+nav > ul {
+    list-style: none;
+}
+
+/* attribute selector */
+a[target="_blank"] {
+    color: royalblue;
+    font-weight: bold;
+}
+
+/* pseudo-class */
+.btn:hover {
+    background: green;
+}
+
+/* specificity */
+/* inline style > id > class > element */
+
+
+
+
+/* Box Model */
+/* 
++-----------------------------------------+
+|                Margin                   |
+|  +-----------------------------------+  |
+|  |              Border               |  |
+|  |  +-----------------------------+  |  |
+|  |  |          Padding            |  |  |
+|  |  |  +-----------------------+  |  |  |
+|  |  |  |      Content          |  |  |  |
+|  |  |  +-----------------------+  |  |  |
+|  |  +-----------------------------+  |  |
+|  +-----------------------------------+  |
++-----------------------------------------+ 
+*/
+
+
+#about {
+    background: white;
+    padding: 60px 0;
+    margin-top: 30px;
+}
+
+.skill-card {
+    background: white;
+    padding: 25px;
+    border: 1px solid #ddd;
+    margin: 10px;
+    border-radius: 8px;
+}
+
+/* background     → Card color
+padding        → Space around text
+border         → Card outline
+margin         → Gap between cards
+border-radius  → Rounded corners */
+
+.project-card {
+    background: white;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    margin-top: 20px;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 5px;
+}
+
+input,
+textarea {
+    width:100%;
+    padding:12px;
+    border:1px solid #bbb;
+    margin-bottom:15px;
+    border-radius:5px;
+}
+
+
+/* Flexbox is a one-dimensional layout system. It helps arrange items in one direction—either row (horizontal) or column (vertical). */
+/* The .container becomes the Flex Container when we do display:flex
+Its direct children become flex items.
+Main axis -> justify-content
+Cross axis -> align-items
+default main axis is row
+*/
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+nav ul {
+    display:flex;
+    gap:20px;
+}
+
+.hero-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 40px;
+}
+
+
+/* Grid */
+/* Flexbox → Arrange items in one direction (row or column).
+CSS Grid → Arrange items in rows and columns at the same time. */
+
+.project-gird {
+    display: grid;
+    /* creates 2 columns (fr means fraction) */
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.skills-grid {
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:20px;
+}
+
+.skill-card {
+    background:white;
+    padding:25px;
+    border-radius:8px;
+    text-align:center;
+    border:1px solid #ddd;
+}
+
+.project-card {
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    border:1px solid #ddd;
+}
+
+.project-card img {
+    width:100%;
+    border-radius:8px;
+}
+
+/* pixels : same size for all devices */
+/* rem : relative to root html font size (multiple of html font-size) */
+/* em : depends on parent element */
+/* percentage : container takes % respect to parent */
+/* vw : 50% of screen width */
+/* vh : 50% of screen height */
+/* media queries are used to make things responsive */
+
+
+/* screen width 768 or more */
+@media(min-width:768px) {
+    .project-grid {
+        grid-template-columns:repeat(2,1fr);
+    }
+}
+
+/* screen width 1024 or more */
+@media(min-width:1024px) {
+    .project-grid{
+        grid-template-columns:repeat(3,1fr);
+    }
+}
