@@ -1,0 +1,221 @@
+(*) Why were indexes invented ?
+Imagine a table customer with fields (CustomerID, Name, City) with 10M entries.
+Suppose we want to find person with CustomerID = 10000000; 
+How MySQL find this row ?
+
+-> Without an index, MySQL does something called a Full Table Scan.
+It checks every row until it finds the required one.
+TC : O(N)
+As data grows, searching becomes slower.
+
+
+-> An index is a seperate data structure that helps the database locate rows quickly without scanning the entire table.
+Think of it as an extra lookup structure maintained by database.
+
+
+(*) What happens internally ?
+Suppose the data table is :-
+CustomerID              Name
+1                       a
+2                       b
+3                       c
+4                       d
+5                       e
+
+If CustomerID is indexed, MySQL internally keeps something conceptually like :-
+Indexed Value               Points to Row
+1                           Row 1
+2                           Row 2
+3                           Row 3
+4                           Row 4
+5                           Row 5
+
+When you search (WHERE CustomerID = 4), MySQL first searches the index instead of reading every row.
+Index does not store entire row, it stores pointer to the location of the row.
+Databases like MySQL uses a B-Tree for most indexes which make the search faster compared to linear searching.
+
+            50
+          /    \
+       <50      >50
+      /            \
+    20             80
+   /  \           /  \
+10   30        70    90
+To search index with value 10, only 3 comparisions are needed where in linear traversal it would take large iterations comparatively.
+Search in B-Tree / B+ Tree takes O(logn) time complexity.
+
+Why not Linked List ? -> O(n) time
+Why not Array + BS ? -> Good for search O(logn) but insert and delete take O(n)
+Why not BST ? -> It is good but is not balanced one.
+Why not Hash Table ? -> Used only for exact match (cant do range search like > or < or between)
+
+In B+ Tree, Leaves are linked which makes range querying easier.
+-------------------------------------------------------------------------
+
+(*) Types of indexes
+1. Primary index
+2. Unique index
+3. Single-column index
+4. Composite index (Multi-column)
+5. Full-text index
+6. Spatial index
+
+
+(1) Primary index
+-> created automatically on primary key
+-> no duplicates
+-> no null values
+-> only one primary key per table
+
+(2) Unique index
+-> No duplicates
+-> automatically indexed
+-> multiple unique indexes can exists
+-> not the primary key
+-> allows null
+
+-- Example :-
+EmployeeID → Primary Key
+PAN Number → Unique
+Email → Unique
+Phone → Unique 
+(Only one primary key and many unique indexes)
+
+(3) Single-Column index
+-> Using the index on the most used attribute for retrival.
+
+(4) Composite index
+-> Improves searching involving multiple columns efficient.
+-> No need to create seperate index for each attribute when used together mostly to retrive content.
+-> A composite index is designed for queries that commonly use those columns together.
+
+(5) Spatial index
+-> Specialized for geographic and geometric searches.
+-> Example : google maps, uber, food apps
+
+(6) Full-text index
+-> Designed specifically for searching words and phrases efficiently in large text columns. (Blogs, Articles, etc) [applicable to my topic of project]
+-------------------------------------------------------------------------
+## Clustered and Non-Clustered Indexes
+
+A **clustered index** determines how the actual rows of a table are organized and stored. In MySQL’s InnoDB storage engine, the primary key normally acts as the clustered index. The leaf nodes of the clustered B+ Tree contain the complete rows of the table, not merely references to those rows. Therefore, searching by the primary key directly reaches the leaf node containing the required row.
+
+For example, consider a `Customers` table with `CustomerID` as its primary key. InnoDB organizes the table data according to `CustomerID`. Conceptually, the clustered index contains entries such as:
+
+```text
+1 → Complete row of customer 1
+2 → Complete row of customer 2
+3 → Complete row of customer 3
+```
+
+Because the complete row is present in the clustered index, a primary-key search normally requires only one index traversal.
+
+```sql
+WHERE CustomerID = 3
+```
+
+A table can have only **one clustered index** because its actual rows can be organized in only one order. The same table cannot simultaneously be physically organized by `CustomerID`, `City`, `Name`, and `Email`.
+
+A **non-clustered index**, also called a **secondary index**, is a separate index created on a column other than the clustered key. It does not replace the clustered index and does not normally contain the complete table row. In InnoDB, a secondary index contains the indexed column value along with the primary-key value of the corresponding row.
+
+For example, if an index is created on the `City` column, the secondary index conceptually contains:
+
+```text
+Ahmedabad → CustomerID 4
+Delhi     → CustomerID 1
+Mumbai    → CustomerID 2
+Surat     → CustomerID 3
+Surat     → CustomerID 5
+```
+
+Suppose MySQL must execute:
+
+```sql
+SELECT *
+FROM Customers
+WHERE City = 'Surat';
+```
+
+MySQL first searches the secondary index on `City`. From this index, it obtains the matching primary-key values, such as `CustomerID 3` and `CustomerID 5`. It then uses these primary-key values to search the clustered index and retrieve the complete customer rows.
+
+The process is therefore:
+
+```text
+Secondary index on City
+        ↓
+Matching primary-key values
+        ↓
+Clustered primary-key index
+        ↓
+Complete table rows
+```
+
+This usually requires two index lookups: one lookup in the secondary index and another lookup in the clustered index. This is why retrieving a complete row through a secondary index can require more work than retrieving it directly through the primary key.
+
+### What happens when another column is indexed?
+
+If a table already has a primary key and an index is created on another column, the primary-key index is **not removed or replaced**. MySQL keeps both indexes.
+
+For example, suppose `CustomerID` is the primary key and an index is created on `City`. The table will then have:
+
+```text
+Clustered index on CustomerID
+→ Contains the complete table rows
+
+Secondary index on City
+→ Contains City values and corresponding CustomerID values
+```
+
+If another index is created on `Name`, MySQL will keep three index structures:
+
+```text
+1. Clustered index on CustomerID
+2. Secondary index on City
+3. Secondary index on Name
+```
+
+MySQL examines each query and chooses the most suitable index. A condition on `CustomerID` can use the primary-key clustered index, while a condition on `City` can use the secondary city index.
+
+```sql
+WHERE CustomerID = 5
+```
+
+uses the primary-key index.
+
+```sql
+WHERE City = 'Surat'
+```
+
+can use the city index.
+
+```sql
+WHERE Name = 'Amit'
+```
+
+can use the name index, provided such an index exists.
+
+Therefore, creating an index on another column does not move the clustered index from the primary key to that column. It creates an additional secondary index. A table can have one clustered index and multiple secondary indexes.
+
+### Main Difference
+
+A clustered index contains and organizes the actual table rows. A non-clustered index is a separate lookup structure that helps locate rows through the clustered index.
+
+```text
+Clustered index:
+Primary key → Complete row
+
+Non-clustered index:
+Indexed value → Primary key → Complete row
+```
+
+### Important Points
+
+* In InnoDB (database engine), the primary key normally becomes the clustered index.
+* The clustered index contains complete table rows in its leaf nodes.
+* A table can have only one clustered index.
+* Additional indexes are secondary or non-clustered indexes.
+* Creating a secondary index does not delete the primary-key index.
+* A secondary index stores its indexed value and the corresponding primary-key value.
+* Multiple secondary indexes can exist on the same table.
+* MySQL selects an appropriate index according to the query.
+* Too many secondary indexes consume storage and increase the cost of `INSERT`, `UPDATE`, and `DELETE` operations.
