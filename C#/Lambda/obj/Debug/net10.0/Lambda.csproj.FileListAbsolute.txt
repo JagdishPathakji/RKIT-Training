@@ -1,0 +1,15 @@
+C:\Users\patha\OneDrive\Desktop\Training\C#\Lambda\bin\Debug\net10.0\Lambda.exe
+C:\Users\patha\OneDrive\Desktop\Training\C#\Lambda\bin\Debug\net10.0\Lambda.deps.json
+C:\Users\patha\OneDrive\Desktop\Training\C#\Lambda\bin\Debug\net10.0\Lambda.runtimeconfig.json
+C:\Users\patha\OneDrive\Desktop\Training\C#\Lambda\bin\Debug\net10.0\Lambda.dll
+C:\Users\patha\OneDrive\Desktop\Training\C#\Lambda\bin\Debug\net10.0\Lambda.pdb
+C:\Users\patha\OneDrive\Desktop\Training\C#\Lambda\obj\Debug\net10.0\Lambda.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\patha\OneDrive\Desktop\Training\C#\Lambda\obj\Debug\net10.0\Lambda.AssemblyInfoInputs.cache
+C:\Users\patha\OneDrive\Desktop\Training\C#\Lambda\obj\Debug\net10.0\Lambda.AssemblyInfo.cs
+C:\Users\patha\OneDrive\Desktop\Training\C#\Lambda\obj\Debug\net10.0\Lambda.csproj.CoreCompileInputs.cache
+C:\Users\patha\OneDrive\Desktop\Training\C#\Lambda\obj\Debug\net10.0\Lambda.sourcelink.json
+C:\Users\patha\OneDrive\Desktop\Training\C#\Lambda\obj\Debug\net10.0\Lambda.dll
+C:\Users\patha\OneDrive\Desktop\Training\C#\Lambda\obj\Debug\net10.0\refint\Lambda.dll
+C:\Users\patha\OneDrive\Desktop\Training\C#\Lambda\obj\Debug\net10.0\Lambda.pdb
+C:\Users\patha\OneDrive\Desktop\Training\C#\Lambda\obj\Debug\net10.0\Lambda.genruntimeconfig.cache
+C:\Users\patha\OneDrive\Desktop\Training\C#\Lambda\obj\Debug\net10.0\ref\Lambda.dll

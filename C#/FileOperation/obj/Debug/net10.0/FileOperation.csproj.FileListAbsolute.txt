@@ -1,0 +1,15 @@
+C:\Users\patha\OneDrive\Desktop\Training\C#\FileOperation\obj\Debug\net10.0\FileOperation.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\patha\OneDrive\Desktop\Training\C#\FileOperation\obj\Debug\net10.0\FileOperation.AssemblyInfoInputs.cache
+C:\Users\patha\OneDrive\Desktop\Training\C#\FileOperation\obj\Debug\net10.0\FileOperation.AssemblyInfo.cs
+C:\Users\patha\OneDrive\Desktop\Training\C#\FileOperation\obj\Debug\net10.0\FileOperation.csproj.CoreCompileInputs.cache
+C:\Users\patha\OneDrive\Desktop\Training\C#\FileOperation\obj\Debug\net10.0\FileOperation.sourcelink.json
+C:\Users\patha\OneDrive\Desktop\Training\C#\FileOperation\bin\Debug\net10.0\FileOperation.exe
+C:\Users\patha\OneDrive\Desktop\Training\C#\FileOperation\bin\Debug\net10.0\FileOperation.deps.json
+C:\Users\patha\OneDrive\Desktop\Training\C#\FileOperation\bin\Debug\net10.0\FileOperation.runtimeconfig.json
+C:\Users\patha\OneDrive\Desktop\Training\C#\FileOperation\bin\Debug\net10.0\FileOperation.dll
+C:\Users\patha\OneDrive\Desktop\Training\C#\FileOperation\bin\Debug\net10.0\FileOperation.pdb
+C:\Users\patha\OneDrive\Desktop\Training\C#\FileOperation\obj\Debug\net10.0\FileOperation.dll
+C:\Users\patha\OneDrive\Desktop\Training\C#\FileOperation\obj\Debug\net10.0\refint\FileOperation.dll
+C:\Users\patha\OneDrive\Desktop\Training\C#\FileOperation\obj\Debug\net10.0\FileOperation.pdb
+C:\Users\patha\OneDrive\Desktop\Training\C#\FileOperation\obj\Debug\net10.0\FileOperation.genruntimeconfig.cache
+C:\Users\patha\OneDrive\Desktop\Training\C#\FileOperation\obj\Debug\net10.0\ref\FileOperation.dll

@@ -98,4 +98,3 @@ SELECT department, AVG(salary) as avgsalary FROM employees GROUP BY department O
 ALTER TABLE employees ADD COLUMN bonus INT;
 SELECT * FROM employees;
 SELECT empname, IFNULL(bonus,0) AS bonus FROM employees;
-

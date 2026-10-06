@@ -1,0 +1,15 @@
+C:\Users\patha\OneDrive\Desktop\Training\C#\BaseLib\bin\Debug\net10.0\BaseLib.exe
+C:\Users\patha\OneDrive\Desktop\Training\C#\BaseLib\bin\Debug\net10.0\BaseLib.deps.json
+C:\Users\patha\OneDrive\Desktop\Training\C#\BaseLib\bin\Debug\net10.0\BaseLib.runtimeconfig.json
+C:\Users\patha\OneDrive\Desktop\Training\C#\BaseLib\bin\Debug\net10.0\BaseLib.dll
+C:\Users\patha\OneDrive\Desktop\Training\C#\BaseLib\bin\Debug\net10.0\BaseLib.pdb
+C:\Users\patha\OneDrive\Desktop\Training\C#\BaseLib\obj\Debug\net10.0\BaseLib.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\patha\OneDrive\Desktop\Training\C#\BaseLib\obj\Debug\net10.0\BaseLib.AssemblyInfoInputs.cache
+C:\Users\patha\OneDrive\Desktop\Training\C#\BaseLib\obj\Debug\net10.0\BaseLib.AssemblyInfo.cs
+C:\Users\patha\OneDrive\Desktop\Training\C#\BaseLib\obj\Debug\net10.0\BaseLib.csproj.CoreCompileInputs.cache
+C:\Users\patha\OneDrive\Desktop\Training\C#\BaseLib\obj\Debug\net10.0\BaseLib.sourcelink.json
+C:\Users\patha\OneDrive\Desktop\Training\C#\BaseLib\obj\Debug\net10.0\BaseLib.dll
+C:\Users\patha\OneDrive\Desktop\Training\C#\BaseLib\obj\Debug\net10.0\refint\BaseLib.dll
+C:\Users\patha\OneDrive\Desktop\Training\C#\BaseLib\obj\Debug\net10.0\BaseLib.pdb
+C:\Users\patha\OneDrive\Desktop\Training\C#\BaseLib\obj\Debug\net10.0\BaseLib.genruntimeconfig.cache
+C:\Users\patha\OneDrive\Desktop\Training\C#\BaseLib\obj\Debug\net10.0\ref\BaseLib.dll

@@ -1,0 +1,209 @@
+Topic 1 — C# ↔ MySQL: What do we need?________________________________________________________________________
+Before CRUD with DB using C#, we need to understand how a C# program establishes communication with MySQL. C# does not natively know how to communicate with MySQL. We use a MySQL.NET driver / connector.
+
+The basic pieces are:
+1. C# application
+2. MySQL .NET connector
+3. MySQL Server
+
+The connector provides classes such as:
+- MySqlConnection
+- MySQLCommand
+- MySQLDataReader
+
+1.1 MySqlConnection Class
+________________________________________________________________________
+MySQLConnection class's job is to represent a connection between your C# application and the MySQL server. 
+Conceptually:
+    MySqlConnection connection = new MySqlConnection(connectionStr);
+Then:
+    connection.Open();
+Now our application has an active connection to MySQL. and eventually:
+    connection.Close();
+or preferably, use `using` so it is disposed automatically.
+
+
+1.2 Connection String
+________________________________________________________________________
+It contains the information required to locate and authenticate with MySQL. For example:
+    Server=localhost;
+    Database=knowledge_base;
+    UserID=root;
+    Password=root;
+Meaning:
+    Server - where is MySQL ?
+    Database - which database ?
+    User ID - Who is connecting ?
+    Password - Authentication
+
+So basic flow is:
+1. Create connection String
+2. Create MySqlConnection
+3. Open Connection
+4. Execute database operations
+5. Close/dispose connection
+
+
+
+
+Topic 2 - MySQL Connector in C#
+________________________________________________________________________
+To let a C# application communicate with MySQL, we need a .NET library that knows how to communicate with a MySQL server. We'll use `MySQL.Data`.
+
+
+2.1 What is MySql.Data ?
+________________________________________________________________________
+It is a .NET package provided by MySQL. It gives our C# project classes for communication with MySQL, such as:
+- MySqlConnection
+- MySQLCommand
+- MySqlDataReader
+
+We need to install it using command:
+    dotnet add package MySql.Data
+
+After installing the package, we can import its namespace:
+    using MySql.Data.MySqlClient;
+Now above 3 classes will be available.
+
+
+Topic 3 - Connection String
+________________________________________________________________________
+
+Basic connection string looks like:
+    string connectionString =
+    "Server=localhost;Database=crud_demo;User ID=root;Password=your_password;";
+It is just a string containing connection information.
+
+- Server tells the connector where the Mysql server is running.
+- Port is where MySQL normally listens for requests (3306).
+- Database is the name of database we want to work with.
+- User ID specifies account being used for authentication.
+- Password is the password for that MySQL client.
+
+Creating connection object does not estalbishes the connection. We actually need to open the connection using Open() method.
+
+
+
+Topic 3 - MySql Command
+________________________________________________________________________
+MySqlCommand represents a SQL command that you want to execute on MySQL.
+Example:
+    string query = "SELECT * FROM USERS";
+    MySqlCommand command = new MySqlCommand(query,connection);
+
+MySqlCommand needs two main things:
+    1. Query
+    2. Connection Object
+This means: Create a command containing this SQL and associate it with this MySQL connection.
+
+Creating a command does not execute it. It doesn't send the SQL to MySQL yet. The execution happens when we call an execution method such as:
+    command.ExecuteNonQuery();
+    command.ExecuteReader();
+    command.ExecuteScalar();
+
+The SQL inside the command is available through the CommandText property. The connection is available through Command property.
+    command.Connection = connection;
+    command.CommandText = "SELECT * FROM USERS";
+
+
+
+Topic 4 - Execution Methods
+________________________________________________________________________
+
+4.1 ExecuteNonQuery()
+It executes a SQL command where you don't expect a result set of rows to be returned. The most common cases are:
+    INSERT
+    UPDATE
+    DELETE
+We don't need MySQL to send back a table of users. We mainly want to know:
+    Was the operation performed ? and how many rows were affected ?
+That's what ExecuteNonQuery() is designed for.
+
+
+4.2 ExecuteScalar()
+ExecuteScalar() is used when your SQL returns one value, and you only care about that one value.
+
+The key idea:
+    ExecuteScalar() returns the first column of the first row of the result.
+Example:
+    SELECT COUNT(*) FROM USERS;
+    SELECT MIN(id) FROM USERS;
+    SELECT SUM(AMOUNT) FROM USERS;
+Scalar generally means a single value. 
+Code:
+    object result = command.ExecuteScalar();
+It return object because database doesn't necessarily know what C# type you want. Value may be int, string, double, etc. object is natural general representation. If there is no result, it returns `null`.
+A concrete data type (System.Object). It is the ultimate base class for all types in C#.
+
+
+4.3 ExecuteReader()
+Use it when your SQL returns a result set containing rows and columns.
+When we have data from MySQL in multiple rows, we need to go through these rows one by one. That's what MySqlDataReader allows us to do.
+
+Code:
+    using MySqlDataReader reader = command.ExecuteReader();
+reader.Read() allows us to move the reader to the next row.
+Access columns using reader["name"], reader[0], etc
+Better to convert to required C# type. It returns false if there are no more rows.
+
+
+4.4 MySqlDataReader in Depth
+1. Reader is forward-only.
+2. Reader is positioned to current row.
+3. access columns using reader["columnname"] or reader[index].
+4. Getting strongly types values (integer, string, etc).
+5. Reader must be disposed.
+
+GetInt32() does not perform general conversion. It expects the underlying database value to already be an Int32. Convert.ToInt32() actually performs conversion. Both can throw exceptions. Neither is simply "safe".
+
+
+4.5 Parameterzied Queries
+Code:
+    string query = "INSERT INTO USERS (name,email) 
+        VALUES (@name,@email)";
+
+What is @name ?
+@name is a parameter placeholder. C# supplies values to it.
+
+    string query = "INSERT INTO users (name, email) " + "VALUES (@name, @email)";
+
+    using MySqlCommand command =
+        new MySqlCommand(query, connection);
+
+    /*
+    Good for:
+        small/simple CRUD code
+        quick development
+        cases where the C# value's type maps cleanly to MySQL
+    */
+
+    /*
+    MySqlCommand
+    │
+    ├── CommandText
+    ├── Connection
+    ├── CommandType (.Text,.StoredProcedure, etc)
+    ├── CommandTimeout :- This specifies how long the command is        allowed to execute before timing out. (in seconds)
+    └── Parameters
+
+    // MySqlParameterCollection parameters = command.Parameters;
+    // MySqlParameterCollection is a collection class specifically designed to hold MySqlParameter objects.
+    // 
+    */
+    command.Parameters.AddWithValue("@name", "Jagdish");
+    command.Parameters.AddWithValue("@email", "jagdish@gmail.com");
+    command.Parameters.AddWithValue("@email", DBNull.Value);
+
+    /*
+        Prefer this when you want explicit control over the parameter's database type, especially in more deliberate production code.
+    */
+    // or
+    // command.Parameters.Add("@id", MySqlDbType.Int32).Value = id;
+    // command.Parameters.Add("@name", MySqlDbType.VarChar).Value = name;
+    // command.Parameters.Add("@email",MySqlDbType.VarChar).Value = DBNull.Value;
+
+    int rowsAffected = command.ExecuteNonQuery();
+    Console.WriteLine($"Rows affected: {rowsAffected}");
+
+command.Parameters.Clear(); removes all parameters from collection
+command.Parameters.Remove(command.Parameters["@age"]); removes one specific parameter.

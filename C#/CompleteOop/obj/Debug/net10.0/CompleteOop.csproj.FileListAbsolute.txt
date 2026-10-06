@@ -1,0 +1,14 @@
+C:\Users\patha\OneDrive\Desktop\CompleteOop\bin\Debug\net10.0\CompleteOop.exe
+C:\Users\patha\OneDrive\Desktop\CompleteOop\bin\Debug\net10.0\CompleteOop.deps.json
+C:\Users\patha\OneDrive\Desktop\CompleteOop\bin\Debug\net10.0\CompleteOop.runtimeconfig.json
+C:\Users\patha\OneDrive\Desktop\CompleteOop\bin\Debug\net10.0\CompleteOop.dll
+C:\Users\patha\OneDrive\Desktop\CompleteOop\bin\Debug\net10.0\CompleteOop.pdb
+C:\Users\patha\OneDrive\Desktop\CompleteOop\obj\Debug\net10.0\CompleteOop.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\patha\OneDrive\Desktop\CompleteOop\obj\Debug\net10.0\CompleteOop.AssemblyInfoInputs.cache
+C:\Users\patha\OneDrive\Desktop\CompleteOop\obj\Debug\net10.0\CompleteOop.AssemblyInfo.cs
+C:\Users\patha\OneDrive\Desktop\CompleteOop\obj\Debug\net10.0\CompleteOop.csproj.CoreCompileInputs.cache
+C:\Users\patha\OneDrive\Desktop\CompleteOop\obj\Debug\net10.0\CompleteOop.dll
+C:\Users\patha\OneDrive\Desktop\CompleteOop\obj\Debug\net10.0\refint\CompleteOop.dll
+C:\Users\patha\OneDrive\Desktop\CompleteOop\obj\Debug\net10.0\CompleteOop.pdb
+C:\Users\patha\OneDrive\Desktop\CompleteOop\obj\Debug\net10.0\CompleteOop.genruntimeconfig.cache
+C:\Users\patha\OneDrive\Desktop\CompleteOop\obj\Debug\net10.0\ref\CompleteOop.dll

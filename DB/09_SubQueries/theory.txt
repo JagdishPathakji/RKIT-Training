@@ -1,0 +1,38 @@
+(*) Why do subqueries even exist? Can't JOIN solve everything?
+-- A JOIN answers: "How do I combine information from multiple tables?"
+-- A Subquery answers: "I need the answer to one question before I can answer another."
+
+
+
+(*) Types of Subqueries
+-- 1. Single row
+-- 2. Multiple row
+-- 3. Correlated
+
+
+
+(*) Topic 1 :- Single Row Subquery
+-- A single-row subquery returns exactly one value.
+-- Example : SELECT AVG(salary) FROM employees; 
+-- Operators Used with Single-Row Subqueries are : =, !=, <, >, <=, >=
+
+
+
+(*) Topic 2 :- Multiple Row Subquery
+-- A multiple-row subquery returns multiple value.
+-- Example : SELECT dept_id FROM projects;
+-- Operators Used with Multiple-Row Subqueries are : IN , NOT IN, ANY, ALL.
+
+
+
+(*) Topic 3 :- Using EXISTS and NOT EXISTS
+-- Unlike IN, ANY, and ALL, these do not compare values. Instead, they answer a yes/no question.
+-- EXISTS : Does the subquery return at least one row?
+-- NOT EXISTS : Does the subquery return no rows?
+
+
+
+(*) Topic 4 :- Correlated Subqueries
+-- A correlated subquery is dependent on the outer query. 
+-- So the inner query needs information from the outer query.
+-- Conceptually, the inner query is evaluated for each row of the outer query.

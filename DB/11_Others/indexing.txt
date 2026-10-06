@@ -1,0 +1,27 @@
+Imagine your USER table has:
+1. A Clustered Index on user_id (The Primary Key).
+2. A Non-Clustered Index on email (The Secondary Index).
+
+
+Scenario A: Searching by Clustered Index
+Your Query: SELECT * FROM USER WHERE user_id = 50;
+
+- Step 1: The database goes straight to the main Clustered Index (which is sorted numerically by user_id).
+- Step 2: It plays the "Higher or Lower" B-Tree guessing game and instantly finds user_id = 50.
+- Step 3: Because it is the Clustered Index, the actual table data (the email, username, and password) is physically stored right there in that exact spot. It grabs the data and returns it to you.
+
+
+Scenario B: Searching by Non-Clustered Index
+Your Query: SELECT * FROM USER WHERE email = 'jane@example.com';
+
+- Step 1: The database cannot use the Clustered Index because it is sorted by ID, not by email. So, it goes to the Non-Clustered email Index.
+
+- Step 2: It plays the "Higher or Lower" guessing game on the alphabetically sorted emails until it finds 'jane@example.com'.
+
+- Step 3: It looks at the entry, but the full row data isn't there! The entry just says: "Jane's Primary Key is user_id = 50".
+
+- Step 4: The database takes that user_id = 50, turns around, and goes to the main Clustered Index.
+
+- Step 5: It plays the "Higher or Lower" guessing game again to find user_id = 50.
+
+- Step 6: It finds the spot, grabs the full row (with the username and password), and returns it to you.

@@ -1,0 +1,95 @@
+---------- REPLACE INTO QUESTION --------------
+
+Imagine you have 10 users in your database, and the Auto-Increment counter is currently sitting at 11 (ready for the next person who signs up).
+Your Table Before: IDs: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10.
+
+The Scenario
+You try to insert a new row, but the email address matches the person at ID 5, causing a crash (a duplicate collision). You are using REPLACE INTO to handle it.
+Here is the exact sequence of events MySQL executes in milliseconds:
+-- Step 1: The Delete
+MySQL realizes there is a collision on the 5th row. It physically deletes that row. Your Table: IDs: 1, 2, 3, 4, (gone), 6, 7, 8, 9, 10
+
+-- Step 2: The Insert
+Now that the duplicate email is out of the way, MySQL inserts your new row. Because it is a brand new insert, MySQL looks at the Auto-Increment counter (which is at 11) and assigns it to this row. 
+Your Table: IDs: 1, 2, 3, 4, 6, 7, 8, 9, 10, 11
+
+-- Step 3: The Aftermath
+The operation is complete.
+
+-- ID 5 is permanently gone. You now have a gap in your sequence.
+-- The data that used to be at ID 5 is now sitting at the bottom of the table at ID 11.
+-- The Auto-Increment counter moves up to 12 for the next person.
+
+
+
+---------- UPSERT INTO QUESTION -----------
+
+Imagine you have 10 users in your database, and the Auto-Increment counter is currently sitting at 11 (ready for the next person who signs up).
+Your Table Before: IDs: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+
+The Scenario
+You try to insert a new row, but the email address matches the person at ID 5, causing a crash (a duplicate collision). You are using UPSERT to handle it.
+Here is the exact sequence of events MySQL executes in milliseconds:
+-- Step 1: The Attempt (Grabbing the ID)
+MySQL prepares to insert the new row. Behind the scenes, it officially grabs the next available number from the Auto-Increment counter (which is 11) to get ready for the insert. 
+Your Table: IDs: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 (Internal Counter is now sitting at 12)
+
+-- Step 2: The Collision & The Pivot
+MySQL attempts the insert, but realizes there is a collision on the 5th row. Instead of deleting it, MySQL immediately abandons the insert. It pivots and simply runs an UPDATE on the existing data at ID 5. 
+Your Table: IDs: 1, 2, 3, 4, 5 (Updated!), 6, 7, 8, 9, 10
+
+Step 3: The Aftermath
+The operation is complete.
+
+-- ID 5 is perfectly safe. It was never deleted, meaning all of their articles and comments are completely safe.
+-- Because MySQL grabbed ID 11 in Step 1, but abandoned the insert in Step 2, that number is thrown in the trash. It is "burned" forever.
+-- The Auto-Increment counter remains at 12 for the next person.
+-- The Final Result: When the next brand new user signs up, your table will look like this: 
+IDs: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12 (Notice 11 was skipped harmlessly!)
+-- It only updates the exact columns you explicitly type in the UPDATE section. Everything else in that row stays completely untouched.
+
+
+
+--------- DATE DATATYPES QUESTION ----------
+
+what does timezone aware means ? 
+Ans:- "Timezone Aware" means the database actively translates the time based on who is asking for it.
+
+    Datatype    std format      size        Timezone aware ?    How it handles timezones ?
+1.    TIME	    HH:MM:SS    	3 Bytes	        No	            Completely ignores dates and timezones.
+2.    DATE     YYYY-MM-DD       3 Bytes         No              Completely ignores time and timezone.
+3.  DATETIME   YYYY-MM-DD       8 Bytes         No              Stores exactly what you give it.   
+                HH:MM:SS
+4.  TIMESTAMP  YYYY-MM-DD       4 Bytes         Yes             Provides value based on timezone. 
+                HH:MM:SS
+
+-- Under the hood, MySQL always stores TIMESTAMP data in UTC. It does not matter where you live or how you configure your database; the physical bytes saved on the hard drive are strictly UTC.
+-- When you ask the database to SELECT created_at, it has to decide what timezone to convert that UTC time into. By default, a fresh MySQL installation uses the SYSTEM timezone. This means it just looks at the clock of the computer.
+
+
+
+------------ AUTHORIZATION TABLE --------------
+-- 1. Master Permission Table
+CREATE TABLE PERMISSION (
+    permission_id INT AUTO_INCREMENT PRIMARY KEY,
+    permission_name VARCHAR(100) NOT NULL UNIQUE,
+    description VARCHAR(255)
+);
+
+-- 2. Many-to-Many Mapping
+CREATE TABLE ROLE_PERMISSION (
+    role_id INT NOT NULL,
+    permission_id INT NOT NULL,
+    PRIMARY KEY (role_id, permission_id),
+    FOREIGN KEY (role_id) REFERENCES ROLE(role_id) ON DELETE CASCADE,
+    FOREIGN KEY (permission_id) REFERENCES PERMISSION(permission_id) ON DELETE CASCADE
+);
+
+
+-- Alias naming
+-- parameters
+-- index prefix
+-- restore 
+-- default character set 
+-- data store (redo and undo logs and bein log)
+-- single transaction dump

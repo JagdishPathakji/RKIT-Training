@@ -1,0 +1,14 @@
+C:\Users\patha\OneDrive\Desktop\FirstCSharpProject\bin\Debug\net10.0\FirstCSharpProject.exe
+C:\Users\patha\OneDrive\Desktop\FirstCSharpProject\bin\Debug\net10.0\FirstCSharpProject.deps.json
+C:\Users\patha\OneDrive\Desktop\FirstCSharpProject\bin\Debug\net10.0\FirstCSharpProject.runtimeconfig.json
+C:\Users\patha\OneDrive\Desktop\FirstCSharpProject\bin\Debug\net10.0\FirstCSharpProject.dll
+C:\Users\patha\OneDrive\Desktop\FirstCSharpProject\bin\Debug\net10.0\FirstCSharpProject.pdb
+C:\Users\patha\OneDrive\Desktop\FirstCSharpProject\obj\Debug\net10.0\FirstCSharpProject.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\patha\OneDrive\Desktop\FirstCSharpProject\obj\Debug\net10.0\FirstCSharpProject.AssemblyInfoInputs.cache
+C:\Users\patha\OneDrive\Desktop\FirstCSharpProject\obj\Debug\net10.0\FirstCSharpProject.AssemblyInfo.cs
+C:\Users\patha\OneDrive\Desktop\FirstCSharpProject\obj\Debug\net10.0\FirstCSharpProject.csproj.CoreCompileInputs.cache
+C:\Users\patha\OneDrive\Desktop\FirstCSharpProject\obj\Debug\net10.0\FirstCSharpProject.dll
+C:\Users\patha\OneDrive\Desktop\FirstCSharpProject\obj\Debug\net10.0\refint\FirstCSharpProject.dll
+C:\Users\patha\OneDrive\Desktop\FirstCSharpProject\obj\Debug\net10.0\FirstCSharpProject.pdb
+C:\Users\patha\OneDrive\Desktop\FirstCSharpProject\obj\Debug\net10.0\FirstCSharpProject.genruntimeconfig.cache
+C:\Users\patha\OneDrive\Desktop\FirstCSharpProject\obj\Debug\net10.0\ref\FirstCSharpProject.dll

@@ -1,0 +1,164 @@
+=-=-=-=-=-==-=-=-=-=-=-==-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+LINQ TO DATATABLE
+=-=-=-=-=-==-=-=-=-=-=-==-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+
+----------------------------------------
+WHY DATATABLE NEEDS SPECIAL TREATMENT ?
+----------------------------------------
+
+    DataTable.Rows   -->  returns a DataRowCollection
+
+DataRowCollection implements the OLD, non-generic IEnumerable (not IEnumerable<T>). LINQ's extension methods (Where, Select, etc.) are defined on IEnumerable<T>. so this will NOT compile:
+    dataTable.Rows.Where(r => ...);   // ERROR: 'Where' not found
+
+To fix this, .NET provides an extension method:
+    dataTable.AsEnumerable()   -->  returns IEnumerable<DataRow>
+
+Once you have IEnumerable<DataRow>, every LINQ method works exactly
+like it did on List<Article> — because the underlying mechanism is
+identical.
+
+IMPORTANT: AsEnumerable() requires:
+    using System.Data;
+
+
+
+---------------------------------------------
+READING VALUES OUT OF A DataRow -- Field<T>()
+---------------------------------------------
+A DataRow doesn't give you typed properties like `article.Title`.
+Instead, columns are accessed by name, and the values come back as
+`object`, requiring a cast. This is clunky:
+
+    string title = (string)row["Title"];
+    int statusId = (int)row["StatusId"];
+
+.NET gives us a cleaner, safer helper: `Field<T>()`
+
+    string title = row.Field<string>("Title");
+    int statusId = row.Field<int>("StatusId");
+
+Field<T>() does the casting for you, AND handles DBNull.Value
+properly (explained next) — always prefer Field<T>() over a raw cast.
+
+
+
+---------------------------------------------------
+HANDLING DBNull -- THE DATATABLE VERSION OF "null"
+---------------------------------------------------
+In a DataTable, a missing/empty value isn't C# `null` — it's a
+special marker object called `DBNull.Value`.
+
+    string summary = row.Field<string>("Summary");
+    // if the column is a nullable string column, Field<string> correctly returns C# null when the cell is DBNull -- no crash
+
+string is a reference type. Reference types are ALLOWED to be null on their own, naturally — no special nullable wrapper needed.
+
+But for VALUE TYPES (int, DateTime, bool, etc.), if the column allows
+nulls, you must use the NULLABLE version of Field<T>:
+
+    int? statusId = row.Field<int?>("StatusId");   // handles DBNull safely
+
+    if (statusId.HasValue)
+    {
+        Console.WriteLine(statusId.Value);
+    }
+
+If you instead write `row.Field<int>("StatusId")` on a column that
+actually contains DBNull, it throws an exception at runtime. So:
+RULE: if a column might contain nulls, always read it as `T?`.
+
+
+When Field<T>() reads a DBNull cell, it needs to hand you back something that means "empty." What it hands back depends entirely on what T is CAPABLE of representing:
+
+-- Field<string>("Summary") — since string can already legally be null, Field<T>() can just give you null directly. No problem, no special type needed.
+-- Field<int>("StatusId") — since plain int CANNOT be null, there's no valid int value to return for "this was empty." Field<T>() has no choice but to throw, because you asked for a type that's structurally incapable of representing "nothing."
+-- Field<int?>("StatusId") — now you're asking for the nullable version, which DOES have a slot for "no value" (HasValue == false). So Field<T>() can safely hand back a proper "empty" result instead of crashing.
+
+
+----------------------------------------
+NOW -- APPLYING WHAT WE ALREADY KNOW
+----------------------------------------
+
+Once you have `IEnumerable<DataRow>` via AsEnumerable(), literally
+EVERYTHING works the same way:
+
+    var published = dataTable.AsEnumerable()
+        .Where(row => row.Field<int>("StatusId") == 5)
+        .ToList();
+
+Filtering, projecting, sorting, grouping, joining — all identical
+concepts. The only difference is HOW you read a value out of each
+"item" (Field<T>("ColumnName") instead of a.PropertyName).
+
+
+----------------------------------------
+PROJECTING A DataRow INTO A TYPED OBJECT
+----------------------------------------
+
+A very common real pattern: convert loose DataRows into a proper
+typed class as early as possible, then work with LINQ on THAT list
+using everything you already know — cleaner than sprinkling Field<T>() calls everywhere.
+
+    var articles = dataTable.AsEnumerable()
+        .Select(row => new Article
+        {
+            ArticleId = row.Field<int>("ArticleId"),
+            Title     = row.Field<string>("Title"),
+            StatusId  = row.Field<int>("StatusId"),
+            AuthorId  = row.Field<int>("AuthorId")
+        })
+        .ToList();
+
+    // From here on, treat `articles` exactly like 
+    // it's a plain List<Article> now.
+
+This is usually the RECOMMENDED approach: convert once, near the
+data-access boundary, and keep the rest of your application working
+with clean typed objects instead of DataRow/Field<T>() everywhere.
+
+
+----------------------------------------------------
+GOING BACK -- LIST<T> TO DATATABLE (CopyToDataTable)
+----------------------------------------------------
+
+Sometimes you need to go the OTHER direction: you have LINQ query
+results (as IEnumerable<DataRow>) and need a real DataTable again —
+e.g. to bind to a legacy grid control, or export to Excel/CSV via
+DataTable-based tooling.
+
+    DataTable filteredTable = dataTable.AsEnumerable()
+        .Where(row => row.Field<int>("StatusId") == 5)
+        .CopyToDataTable();
+
+IMPORTANT: CopyToDataTable() THROWS an exception if the source
+sequence is EMPTY (no rows matched) — there's no schema information
+to build an empty table from a zero-row sequence. Always check first:
+
+    var filteredRows = dataTable.AsEnumerable().Where(row => row.Field<int>("StatusId") == 5);
+
+    DataTable result = filteredRows.Any()
+        ? filteredRows.CopyToDataTable()
+        : dataTable.Clone();   // Clone() copies just the SCHEMA, zero rows -- safe empty fallback
+
+
+
+----------------------------------------
+COMMON MISTAKES WITH DataTable + LINQ
+----------------------------------------
+
+MISTAKE 1 -- forgetting AsEnumerable() entirely:
+    dataTable.Rows.Where(...)   // compile error
+
+MISTAKE 2 -- using Field<int>() on a column that can contain DBNull:
+    row.Field<int>("StatusId")   // throws if the cell is DBNull
+    // fix: row.Field<int?>("StatusId")
+
+MISTAKE 3 -- calling CopyToDataTable() on a possibly-empty query:
+    query.CopyToDataTable();   // throws InvalidOperationException if query has 0 rows
+    // fix: check query.Any() first, or use dataTable.Clone() as a fallback
+
+MISTAKE 4 -- raw casting instead of Field<T>():
+    string title = (string)row["Title"];   // works, but doesn't handle DBNull
+    // safely or read as cleanly as Field<T>()               

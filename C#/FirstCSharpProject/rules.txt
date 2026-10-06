@@ -1,0 +1,19 @@
+dotnet run --file basics.cs → runs only that file.
+
+dotnet run → compiles all .cs files in the project.
+
+Only one top-level-statement file is allowed per project.
+
+Multiple files can contain classes, but don't define the same class/type twice in the same namespace.
+
+Multiple files can work together in one project.
+
+Methods with the same name can be overloaded if their parameters differ.
+
+Return type alone cannot overload a method.
+
+Traditional entry point: static void Main().
+
+Modern C#: top-level statements can replace Main().
+
+static methods can be called without creating an object.

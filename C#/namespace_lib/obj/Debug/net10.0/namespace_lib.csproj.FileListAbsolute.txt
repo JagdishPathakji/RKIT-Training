@@ -1,0 +1,15 @@
+C:\Users\patha\OneDrive\Desktop\Training\C#\namespace_lib\bin\Debug\net10.0\namespace_lib.exe
+C:\Users\patha\OneDrive\Desktop\Training\C#\namespace_lib\bin\Debug\net10.0\namespace_lib.deps.json
+C:\Users\patha\OneDrive\Desktop\Training\C#\namespace_lib\bin\Debug\net10.0\namespace_lib.runtimeconfig.json
+C:\Users\patha\OneDrive\Desktop\Training\C#\namespace_lib\bin\Debug\net10.0\namespace_lib.dll
+C:\Users\patha\OneDrive\Desktop\Training\C#\namespace_lib\bin\Debug\net10.0\namespace_lib.pdb
+C:\Users\patha\OneDrive\Desktop\Training\C#\namespace_lib\obj\Debug\net10.0\namespace_lib.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\patha\OneDrive\Desktop\Training\C#\namespace_lib\obj\Debug\net10.0\namespace_lib.AssemblyInfoInputs.cache
+C:\Users\patha\OneDrive\Desktop\Training\C#\namespace_lib\obj\Debug\net10.0\namespace_lib.AssemblyInfo.cs
+C:\Users\patha\OneDrive\Desktop\Training\C#\namespace_lib\obj\Debug\net10.0\namespace_lib.csproj.CoreCompileInputs.cache
+C:\Users\patha\OneDrive\Desktop\Training\C#\namespace_lib\obj\Debug\net10.0\namespace_lib.sourcelink.json
+C:\Users\patha\OneDrive\Desktop\Training\C#\namespace_lib\obj\Debug\net10.0\namespace_lib.dll
+C:\Users\patha\OneDrive\Desktop\Training\C#\namespace_lib\obj\Debug\net10.0\refint\namespace_lib.dll
+C:\Users\patha\OneDrive\Desktop\Training\C#\namespace_lib\obj\Debug\net10.0\namespace_lib.pdb
+C:\Users\patha\OneDrive\Desktop\Training\C#\namespace_lib\obj\Debug\net10.0\namespace_lib.genruntimeconfig.cache
+C:\Users\patha\OneDrive\Desktop\Training\C#\namespace_lib\obj\Debug\net10.0\ref\namespace_lib.dll

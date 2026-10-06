@@ -1,0 +1,30 @@
+/*
+Functions in SQL:-
+1. Built in
+2. User defined
+*/
+
+/*
+User Defined Functions:-
+It is a resuable block of code that takes input parameters, performs a specific calculation or logic, and must return a value. 
+
+The superpower of SQL functions is that they can be used inline inside standard SQL queries. 
+*/
+
+/*
+How function is different from stored procedure ?
+
+Functions: Can be used directly inside standard SQL queries (e.g., SELECT fn_GetRating() FROM Table or WHERE fn_CheckStatus() = 1).
+Stored Procedures: Cannot be used inside a SQL query. They must be run entirely on their own using the CALL or EXECUTE command.
+
+
+Functions: Must return exactly one value (a single scalar value like an integer/string, or a single table).
+Stored Procedures: Do not have to return anything at all. 
+
+
+Functions: Do not support transactions. You cannot write COMMIT or ROLLBACK inside a function.
+Stored Procedures: Fully support COMMIT, ROLLBACK, and Error Handling (TRY...CATCH). If a complex multi-table update fails halfway through, a Stored Procedure can safely roll back the database to its previous state.
+
+
+In short: Use a Function for reusable math/formatting that you want to stick inside a SELECT statement. Use a Stored Procedure to execute a complex business action (like "Publishing an Article" or "Deleting a User") safely.
+*/

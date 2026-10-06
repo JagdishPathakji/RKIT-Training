@@ -1,0 +1,4 @@
+1. MySQL storage engines and InnoDB in depth.
+2. Triggers with INSERT inside it.
+3. Views algorithms.
+4. charset in DB, usage, types.

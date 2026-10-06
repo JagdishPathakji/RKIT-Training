@@ -1,0 +1,101 @@
+1. What is Cryptography ?
+-----------------------------------------------------------------------
+Cryptography is the use of mathematical techniques to protect information. The main security goals are: 
+    1. Confidentiality - only authorized people can read the data.
+    2. Integrity - data has not been modified.
+    3. Authentication - verify who created / sent the data.
+    4. Non-repudiation - provide evidence that a particular party created a message / signature. (party cannot deny)
+
+
+2. Algorithms vs Goals mapping
+-----------------------------------------------------------------------
+Hashing     ----    Integrity
+HMAC        ----    Integrity + Authentication
+AES         ----    Confidentiality
+RSA         ----    Encryption / digital signature 
+
+
+3. Plaintext and Ciphertext
+-----------------------------------------------------------------------
+Plaintext --> Encryption --> Ciphertext
+Ciphertext --> Decryption --> Plaintext
+
+
+4. Key
+-----------------------------------------------------------------------
+A key is a value used by a Cryptographic algorithm to perform an operation. 
+
+    Plaintext + key ---> Encryption --> Ciphertext
+
+Security should depend on keeping the key secret, not on keeping the algorithm secret.
+
+
+5. Encryption
+-----------------------------------------------------------------------
+Encryption transforms readable data into an unintelligent form using a key. 
+                    Key
+                     ↓
+Plaintext ───────→ Encryption
+                     ↓
+                  Ciphertext
+
+Decryption reverse the process:
+                 Key
+                  ↓
+Ciphertext ───→ Decryption
+                  ↓
+                Plaintext
+
+
+6. Symmetric Encryption
+-----------------------------------------------------------------------
+In symmetric cryptography, the same secret key is used for encryption and decryption. 
+Example:
+        Key = K
+
+        Encrypt(message, K)
+            ↓
+        ciphertext
+
+        Decrypt(ciphertext, K)
+            ↓
+        message
+
+
+7. Asymmetric Cryptography
+-----------------------------------------------------------------------
+Asymmetric cryptography uses a key pair: {public,private}.
+The two keys are mathematically related but have different purposes.
+The public key can generally be shared.
+The private key must be protected.
+RSA is an asymmetric cryptographic algorithm.
+
+
+8. Symmetric vs Asymmetric
+-----------------------------------------------------------------------
+Symmetric                        | Asymmetric
+One shared secret key            | Public + private key
+Example: AES                     | Example: RSA
+Speed: Fast                      | Much slower
+Large data encryption suitable   | Generally unsuitable for large data
+Data encryption is usage         | Signature, key establishment is usage
+
+
+9. Hashing is NOT Encryption
+-----------------------------------------------------------------------
+Encryption is designed to be reversible with the appropriate key.
+Hashing has normally no decryption operation.
+    Input
+      ↓
+  Hash Function
+      ↓
+    Hash
+Generally, no key is required in hashing. It is not reversible. Example algorithm: SHA-256.
+
+
+10. Authentication vs Confidentiality
+-----------------------------------------------------------------------
+Confidentiality:
+    unauthorized people cannot understand the data.
+Authentication:
+    Verify that the data came from an expected/authorized source.

@@ -1,0 +1,1098 @@
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+DECIMAL VS FLOAT VS DOUBLE
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+1. DECIMAL -- 
+- Exact precision
+- 0.1 + 0.2 has exact decimal result. 
+- DECIMAL(M,D) 
+	M = total digits
+	D = digits after decimal
+- Storage size depends on precision
+
+2. FLOAT -- 
+- Approx precision
+- 0.1 + 0.2 May have floating-point error
+- storage size 4 bytes
+- around 7 significant decimal digits of precision.
+
+3. DOUBLE --
+- Higher accuracy than FLOAT
+- Storage size 8 bytes
+- 15–16 significant decimal digits of precision.
+
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+DROP VS DELETE VS TRUNCATE
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+1. DELETE
+- Removes rows.
+- Only matching rows are removed if where is used.
+- table itself remains.
+- triggers DELETE.
+- Use when: you need conditional deletion or row-level control.
+
+2. TRUNCATE
+- Removes all rows while keeping the table structure.
+- It is designed for quickly emptying the entire table.
+- DELETE triggers do not execute.
+- Remove all existing table data by rebuilding/reinitializing the table, rather than deleting rows one-by-one.
+
+3. DROP
+- Removes the entire table.
+- Schema lost.
+
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+UPSERT INTO VS REPLACE INTO
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+1. REPLACE INTO:-
+Imagine you have 10 users in your database, and the Auto-Increment counter is sitting at 11. (ready for the next person who signs up).
+Your table before: IDs: 1,2,3,4,5,6,7,8,9,10
+
+The Scenario:
+	You try to insert a new row, but the email address 	matches the person at ID 5, causing a crash (a duplicate 	collision). You are using REPLACE INTO to handle it.
+
+Here is the exact sequence of events MySQL executes:
+	1. MySQL realizes there is a collision on the 5th row.
+	2. It physically deletes that row.
+	3. Table IDs: 1,2,3,4,(gone),6,7,8,9,10
+	4. Now that duplicate email is out of the way, MySQL 	inserts new row now. Because it is a brand new insert, 	MySQL looks at the Auto-Increment number (which is at 11) 	and assigns it to this row.
+	5. Table IDs: 1,2,3,4,(gone),6,7,8,9,10,11
+
+- ID 5 is permanently gone. You now have a gap in your sequence.
+- The Auto-Increment counter moves up to 12 for the next person.
+
+
+2. UPSERT INTO:-
+Imagine you have 10 users in your database, and the Auto-Increment counter is currently sitting at 11 (ready for the next person who signs up). 
+Your table before: IDs: 1,2,3,4,5,6,7,8,9,10
+
+The Scenario:
+	You try to insert a new row, but the email address 	matches the person at ID 5, causing a crash (a duplicate 	collision).  You are using UPSERT to handle it.
+
+Here is the exact sequence of events MySQL executes:
+	1. MySQL prepares to insert the new row. BTS, it 	officially grabs the next available number from the Auto-	Increment counter (which is 11) to get ready for insert.
+	2. Table IDs: 1,2,3,4,5,6,7,8,9,10 (Insernal counter is n	ow sitting at 12 because 11 is taken)
+	3. MySQL attempts the insert, but realizes there is a 	collision on the 5th row. Instead of deleting it, MySQL 	immediately abandons the insert. It pivots and simply 	runs an UPDATE on the existing data at ID 5. 
+	Your Table: IDs: 1, 2, 3, 4, 5 (Updated!), 6, 7, 8, 9, 10
+
+- ID 5 is perfectly safe. It was never deleted, meaning all of their articles and comments are completely safe.
+- Because MySQL grabbed ID 11 in Step 1, but abandoned the insert in Step 2, that number is thrown in the trash. It is "burned" forever.
+- The Auto-Increment counter remains at 12 for the next person.
+- The Final Result: When the next brand new user signs up, your table will look like this: 
+IDs: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12 (Notice 11 was skipped harmlessly!)
+- It only updates the exact columns you explicitly type in the UPDATE section. Everything else in that row stays completely untouched.
+
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+ORDER OF SQL STATEMENTS
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+1. Writing Order
+- 1. SELECT
+- 2. FROM
+- 3. JOIN / ON
+- 4. WHERE
+- 5. GROUP BY
+- 6. HAVING
+- 7. ORDER BY
+- 8. LIMIT
+
+2. Execution Order
+- 1. FROM
+- 2. JOIN / ON
+- 3. WHERE
+- 4. GROUP BY
+- 5. HAVING
+- 6. SELECT
+- 7. DISTINCT
+- 8. ORDER BY
+- 9. LIMIT
+
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+ROUND() vs TRUNCATE()
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Both control the number of decimal places. 
+
+ROUND():
+	Rounds the value according to the next digit.
+	SELECT ROUND(123.4567, 2); // 123.46
+
+TRUNCATE():
+	Simply cuts off digits. It does not round.
+	SELECT TRUNCATE(123.4567, 2); // 123.45
+
+ROUND(1234.567, 0)    → 1235
+ROUND(1234.567, -1)   → 1230
+ROUND(1234.567, -2)   → 1200
+ROUND(1234.567, -3)   → 1000
+
+TRUNCATE(1234.567, 0) → 1234
+TRUNCATE(1234.567, -1) → 1230
+TRUNCATE(1234.567, -2) → 1200
+TRUNCATE(1234.567, -3) → 1000
+
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+USER DEFINED FUNCTIONS
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+A USER DEFINE FUNCTION is a function that you create in the database to encapsulate reusable logic.
+
+	1. Executes inside the database server
+	2. Must return a value
+	3. Can be used inside expressions such as SELECT
+	4. RETURNS defines the return type
+	5. RETURN supplies the value
+	6. DETERMINISTIC describes that same input produce same 	output.
+	7. NON DETERMINISTIC describes that same input may 	produce different output.
+	8. READS SQL DATA means function reads data from tables.
+	9. CONTAINS SQL means contains SQL statements.
+	10. Can read data, but stored functions have restrictions 	on modifying data and other operations (INSERT, UPDATE, 	DELETE not allowed)
+	11. A stored function cannot modify a table that is 	already being used by the SQL statement that called the 	function.
+	12. FUNCTION cannot return a TABLE
+
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+STORED PROCEDURES
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+1. A stored procedure is a named program stored inside the MySQL database.
+2. CALL procedure_name(arguments)
+3. Parameters:
+	IN (input only)
+	OUT (output only)
+	INOUT (input + output) [
+	IN is default if no mode is specified
+4. IN 
+	caller provided a value
+	procedure can read it
+5. OUT
+	procedure puts a value into the parameter
+	caller retrieves that value using a variable
+6. INOUT
+	caller supplies initial value
+	procedure can read and modify it
+	modifies value is available to the caller
+7. Procedures does not have RETURNS, it can communicate results through:
+	SELECT (output multiple rows) and multiple SELECT
+	OUT parameters
+	INOUT parameters
+8. Procedures can perform data modification (INPUT, UPDATE, DELETE)
+9. SIGNAL allows to raise an error
+10. Procedure can call another procedure
+11. Procedure can call functions
+12. Functions cannot call procedure
+
+
+
+Example:-
+CREATE PROCEDURE sp_ArticleStas( 
+	IN articleId INT,
+	OUT title VARCHAR(255),
+	INOUT views INT
+)
+BEGIN
+	-- IN: read the value supplied by caller
+	SELECT article_title
+	INTO title
+	FROM articles
+	WHERE article_id = articleId;
+
+	-- INOUT: read the supplied value and modify it
+	SET views = views + 1
+END;
+
+SET @views = 10;
+
+CALL sp_ArticleStats(101, @title, @views);
+SELECT @title, @views;
+
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+COMMON TABLE EXPRESSIONS
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+A CTE is a temporary named result set that exists only for the duration of a single SQL statement.
+
+Important points:
+	Temporary for single sql statement
+	has name
+	can be referenced like a table
+	improves readability
+	organize complex query easily
+
+Rules:
+	Must start with `WITH`
+	Must have a name
+	Must contain a SELECT query
+	Can be used only in immediately following stmt
+	CTE can never be stored unlike table or views
+
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TEMPORARY TABLE
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+A temporary table is a table that exists only temporarily during database sessions. It behaves almost like a normal table, but MySQL automatically removes it when the session / connection ends.
+
+Need:
+	Suppose you have a complicated query whose result you need to 	use multiple times. Instead of repeatedly executing the 	complicated query, you can store its result temporarily.
+
+A temporary table normally exists for the current database session / connection. Two users can have same name temporary table because they belong to different sessions.
+
+Use Case:
+	1. store intermediate query result so you can perform multiple 	operations on them.
+	2. when we dont want to calculate expensive intermediate 	result.
+
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+VIEWS
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+A view is a virtual table. It does not store data itself, instead it stores a SELECT query. Whenever someone accesses the view, MySQL executes that stored SELECT statement and returns the latest data.
+
+> We can build views on top of other views with same syntax.
+> Views can contain JOIN, GROUP BY, HAVING, WHERE, DISTINCT, UNION, AGGR FUNCTION, SUBQUERIES, ETC. Almost any valid `SELECT` statement is applicable to views.
+
+Usage:
+	1. Reusable logic
+	2. Cleaner
+	3. Security (can remove password, etc from views)
+	4. Simpler queries when we need to view the data
+
+Limitations:
+1. Can become slower if built on very complex queries.
+
+Updatable and Non Updatable Views:
+	If a view is not a real table, can i INSERT, UPDATE, DELETE 	using it ?
+	> Ans : Sometime Y, Sometime N. It depends on how the view is 	  created.
+
+Generally, a view is updatable when every row in the view maps directly to exactly one row in one base table. 
+
+Example :-
+	CREATE VIEW ProductView AS SELECT * FROM Products;
+	(this is updatable)
+
+A view is not updatable when the SELECT query contains :-
+	1. Group by
+	2. Aggregate functions
+	3. DISTINCT
+	4. Multiple Tables (JOIN)
+
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TRIGGERS
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+A trigger is a database object that automatically executes when a specific event occurs on a table. 
+
+General Flow:
+	Some SQL operation happens
+	Trigger detects it
+	Trigger executes automatically
+	Original operation Completes
+
+What events can trigger it ?
+	INSERT
+	UPDATE
+	DELETE
+
+We can place TRIGGER BEFORE/AFTER depending on the need.
+
+Common Use Cases
+	Logging
+	Validation
+
+#### NEW
+	Imaginary row contains current row. (incoming data).
+	NEW.salary
+	NEW.name
+	NEW.department
+
+#### OLD
+	It is used with UPDATE/DELETE.
+	Helps to compare new and old values.
+	OLD.salary
+	OLD.name
+	OLD.department
+
+> INSERT -> Only NEW exists.
+> DELETE -> Only OLD exists.
+> UPDATE -> Both NEW and OLD exists.
+
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+PREPARED STATEMENT 
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+A prepared statement lets you define an SQL statement once and execute it later with different values. They are useful when values are dynamic and when the same query runs repeatedly.
+
+It is session-scoped, and within that session it remains until you explicitly deallocate it or the session ends.
+
+> The '?' is a parameter placeholder. 
+You can provide the actual value when executing it.
+
+Example:
+	PREPARE statement_name
+	FROM 'SELECT * FROM employees WHERE salary > ?';
+
+	SET @salary = 60000;
+	EXECUTE statement_name USING @salary;
+	
+	DEALLOCATE PREPARE statement_name; -- remove the prepared	statement from the session
+
+
+
+Suppose we want table name to be selected dynamically.
+we cannot do something like:
+	PREPARE stmt FROM 'SELECT * FROM ?';
+
+Instead we have to do:
+	SET @table_name = 'employees';
+	SET @query = CONCAT('SELECT * FROM ', @table_name);
+	PREPARE stmt FROM @query;
+	EXECUTE stmt;
+	DEALLOCATE PREPARE stmt;
+
+Prepared Statement and SQL Injection:
+	Major reasons prepared statements are used is to prevent SQL 	Injection when handling dynamic values.
+	
+	String concatenation:
+	> SQL + user input → SQL parser
+	
+	Prepared statement:
+	> SQL structure → SQL parser
+	> user input → parameter/value (input is not part of SQL 	source code)
+
+Use case:
+	1. Compile once and execute many times
+	2. Security from SQL Injection
+
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+INDEXING 
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+1. Without an index, MySQL scan entire table until required row is found. O(n)
+2. An index is a separate data structure maintained by the database to locate rows effectively.
+3. MySQL storage engine, indexes are based on B tree/B+ tree structure.
+
+4. PRIMARY KEY:
+	MySQL engine creates a clustered index on PRIMARY KEY.
+	The leaf nodes contain the actual table row data.
+	It is called clustered because table's actual records are 	organized according to the primary key.
+
+5. If there is no PRIMARY KEY, MySQL engine still needs clustered index. It choose this order:
+	1. PRIMARY KEY
+	2. first suitable UNIQUE NOT NULL index
+	3. Internal hidden 6-byte row ID
+
+6. UNIQUE KEY:
+	If table has both PRIMARY KEY and UNIQUE KEY, the UNIQUE KEY 	does not form CLUSTERED INDEX. It forms SECONDARY INDEX which 	stores the PRIMARY KEY.
+	
+	Example:-
+	email                         primary key
+	------------------------------------------------
+	a@example.com                 → 17
+	jagdish@example.com           → 42
+	rahul@example.com             → 73
+
+When search by email:
+	1. Use email index to find email
+	2. Get PRIMARY KEY
+	3. Search inside CLUSTERED INDEX using PRIMARY KEY
+	4. Retrieve actual row 
+
+7. COMPOSITE KEY:
+	In this case, there is one index containing two columns.
+	It is mapped with PRIMARY KEY same as normal indexing.
+	
+	Consider:- (author_id, status_id)
+	Conceptually index is sorted by author_id first and status_id 	as second. 
+	
+	This COMPOSITE INDEXING works on search by
+	- author_id
+	- author_id and status_id
+	but does not work for
+	- status_id only
+
+	because indexing is sorted based on author_id first which 	helps in B-Tree traversal while searching.
+
+8. COMPOSITE PRIMARY KEY:
+	PRIMARY KEY (article_id, version_number)
+	Now the CLUSTERED INDEX is order by: article_id first and 	version_number as second.
+	
+9. FULLTEXT INDEX:
+1. Suppose we have this table: articles
+
+ID    title
+─────────────────────────────
+101   MySQL database with CSharp
+102   Database indexing explained
+103   Introduction to programming
+104   MySQL performance tuning
+105   MySQL index optimization
+
+Now create:
+CREATE FULLTEXT INDEX idx_article_title
+ON articles(title);
+MySQL examines the text in every row.
+
+2. MySQL breaks text into words
+
+3. It builds an inverted index
+
+Conceptually, you can imagine MySQL creating something like:
+
+WORD          → ARTICLE IDs
+────────────────────────────────
+mysql         → 101, 104, 105
+database      → 101, 102
+csharp        → 101
+indexing      → 102, 105
+explained     → 102
+performance   → 104
+optimization  → 105
+
+This is called an inverted index because the direction is reversed.
+
+4. Now you search
+
+Suppose:
+
+SELECT *
+FROM articles
+WHERE MATCH(title)
+AGAINST('mysql');
+
+Without FULLTEXT, MySQL may have to examine the text of many rows:
+
+101 → contains mysql? YES
+102 → contains mysql? NO
+103 → contains mysql? NO
+104 → contains mysql? YES
+105 → contains mysql? YES
+
+With FULLTEXT, conceptually it can do:
+
+"mysql"
+   ↓
+FULLTEXT index
+   ↓
+101, 104, 105
+   ↓
+fetch those articles
+
+So it doesn't need to scan every article's complete text just to discover where mysql occurs.
+	
+
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TRANSACTION
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+----------------------------
+PART 1 -- TRANSACTION BASICS
+----------------------------
+1. What is a transaction ?
+-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-
+A transaction is a group of database operations that MySQL treats as one unit of work.
+
+Example:
+```sql
+START TRANSACTION;
+
+UPDATE accounts
+SET balance = balance - 1000
+WHERE account_id = 1;
+
+UPDATE accounts
+SET balance = balance + 1000
+WHERE account_id = 2;
+
+COMMIT;
+```
+
+The two UPDATEs together represent one logical operation.
+
+
+2. AutoCommit
+-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-
+By default, MySQL normally operates with `autocommit = 1`.
+Each individual statement is automatically committed when it successfully finishes.
+Inside a transaction, `autocommit` is always false.
+
+
+3. START TRANSACTION
+-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-
+Start an explicit transaction. The following operations belong to this transaction until it ends.
+
+
+4. COMMIT
+-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-
+COMMIT tells MySQL that the transaction has successfully completed and its changes should be permanently accepted. Transaction locks are released.
+
+
+5. ROLLBACK
+-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-
+Abandon the transaction's changes and return the database to the appropriate state before that transaction's changes. Transaction locks are released.
+
+
+6. What if one statement in TRANSACTION fails ?
+-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-
+A statement error does not automatically mean the entire transaction has been rolled back. We decide whether to ROLLBACK or COMMIT in such scenarios.
+
+
+7. Scenario Typical view
+-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-
+                     START
+                       │
+                       ↓
+                     ACTIVE
+                       │
+          ┌────────────────────┐
+          │                         │
+      operations              operations
+          │                         │
+          └─────────┬──────────┘
+                      │
+             ┌──────┴──────┐
+             │                │
+          COMMIT           ROLLBACK
+             │                │
+             ↓                ↓
+         COMMITTED         ABORTED
+             │                │
+             └──────┬──────┘
+                      ↓
+                     END
+
+------------------------------------
+PART 2 -- WHAT HAPPENS INSIDE InnoDB
+------------------------------------
+1. Client sends UPDATE to MySQL.
+2. MySQL parses the SQL.
+3. MySQL validates table, columns, syntax, permissions, etc.
+4. Optimizer decides how to find the target row, usually using an index if available.
+5. MySQL passes the storage work to InnoDB.
+6. InnoDB locates the page containing the target record.
+-- If the page is already in the Buffer Pool, InnoDB uses it from memory.
+-- If the page is not in the Buffer Pool, InnoDB reads that page from disk into the Buffer Pool.
+7. InnoDB finds the target record inside that page.
+8. InnoDB performs the transactional work required for the change:
+-- acquires required locks
+-- creates undo information
+-- creates redo information
+9. InnoDB modifies the record in the Buffer Pool.
+10. The modified page becomes a dirty page. [disk and buffer has different data]
+11. The transaction remains active until COMMIT or ROLLBACK.
+-- On COMMIT:
+i. transaction is finalized
+ii. required redo durability is handled
+iii. transaction becomes committed
+iv. transaction locks are released
+v. dirty pages do not necessarily need to be written to the data file immediately
+vi. Later, dirty pages are flushed from the Buffer Pool to disk.
+-- On ROLLBACK instead:
+i. InnoDB uses undo information to reverse the transaction's changes
+ii. transaction ends
+iii. transaction locks are released.
+
+
+
+------------------------------------
+PART 3 -- OVERVIEW
+------------------------------------
+1. UPDATE QUERY
+2. FIND PAGE
+3. LOAD PAGE INTO BUFFER POOL
+4. GENERATE UNDO
+5. GENERATE REDO
+6. MODIFY BUFFER POOL PAGE
+7. PAGE BECOMES DIRTY
+8. COMMIT
+9. TRANSACTION COMMIT
+10. LOCKS EVENTUALLY RELEASES AS TRANSACTION ENDS
+11. DIRTY PAGE CAN BE FLUSHED LATER
+
+
+
+
+------------------------
+PART 4 -- ACID
+------------------------
+1. Atomicity ("All or Nothing")
+2. Consistency (bring the database from one valid state to another)
+3. Isolation (concurrently running transactions do not interfere with one another)
+4. Durability (guarantees that once a transaction is committed, its changes are permanently saved)
+
+
+---------------------
+PART 5 -- LOCKS
+---------------------
+Suppose two transactions modify the same row. Without concurrency control, both could modify the same data unpredictably. So InnoDB uses locks to control conflicting operations. 
+
+When T1 modifies the row, X LOCK is acquired. If T2 tries to update, it has to WAIT until T1 commits and releases LOCK.
+
+InnoDB can lock records/index entries and ranges of index entries, not just entire tables. This provides better concurrency as other transaction can work on different rows at same time. 
+
+Two basic lock types
+---------------------
+1. Shared Lock - S
+Used when a transaction wants to read. Multiple transactions can generally hold compatible shared locks simultaneously. 
+
+2. Exclusive - X
+Used when a transaction needs to modify a record. Only one transaction at a time can hold X LOCK on same resource.
+
+COMMIT or ROLLBACK releases the transaction locks.
+
+
+
+--------------------
+PART 6 -- UNDO LOGS
+--------------------
+1. InnoDB transactional history used to reverse changes and reconstruct older row versions.
+2. Answers "How do i go backward ?".
+3. Primary purpose to handle ROLLBACK.
+4. Belongs to InnoDB.
+5. Backward direction.
+6. Generated when InnoDB performs changes.
+7. Stores info that help reconstruct the value.
+8. Exists during the transaction. It maybe still needed after commit temporarily by MVCC (multi version concurrency control)
+9. ROLLBACK is primary use.
+10. Also used by ROLLBACK TO SAVEPOINT.
+11. Used for crash recovery to undo incomplete / uncommited transactional work.
+12. Not used for point-in-time recovery.
+13. Through InnoDB's purge process when no active transaction needs the old history, undo logs are cleared eventually.
+
+-- What they actually store ?
+1. transaction ID
+2. undo record metadata
+3. affected record information
+4. For an INSERT:
+- Information needed to remove the inserted record during rollback.
+For an UPDATE:
+- Previous values of the columns that were changed.
+For a DELETE:
+- Information needed to reconstruct the deleted record.
+For MVCC:
+- The information required to reconstruct an older visible version of the row.
+
+
+
+--------------------
+PART 7 -- REDO LOGS
+--------------------
+1. InnoDB recovery log used to reapply/recover changes that may not have reached the data pages on disk before a crash.
+2. Answers "How do I recover/reapply the change?"
+3. Primary purpose is crash recovery and durability of InnoDB page changes.
+4. Belongs to InnoDB.
+5. Forward direction — reconstruct/reapply the required change.
+5. Generated when InnoDB modifies database/index pages.
+6. Stores information needed to reproduce the modifications to InnoDB pages during recovery.
+7. Exists as part of the ongoing redo stream; after commit, the relevant redo must remain available until it is no longer needed for recovery, after which its space can be reused.
+8. Crash recovery is the primary use.
+9. Not used to perform normal ROLLBACK or ROLLBACK TO SAVEPOINT; rollback is primarily handled using Undo.
+10. During crash recovery, Redo is used to reapply required changes, including changes whose dirty data pages had not yet been persisted to disk.
+11. Not used for reconstructing old row versions.
+12. Not used as the replication log.
+13. Supports the WAL (Write-Ahead Logging) -- principle: required redo information must be persisted ahead of the corresponding data-page persistence so recovery remains possible.
+14. Works with dirty pages in the Buffer Pool; a dirty page can remain in memory while its redo information provides crash-recovery protection.
+15. COMMIT does not mean the data page is immediately written to disk; the committed transaction's required redo durability can be established while the dirty page is flushed later.
+16. During crash recovery, InnoDB uses LSNs (Log Sequence Numbers) to determine which redo records are relevant to pages.
+17. Through checkpointing, once older redo is no longer required for recovery, its space can eventually be reused.
+18. Imagine server has been running for days. Redo logs become very large. We dont need to keep every redo record forever. Eventually InnoDB flushes dirty pages to disk and establishes a `checkpoint` representing how far recovery-relevant changes have been persisted. The logs before that checkpoint are no longer needed.
+
+UPDATE starts
+    ↓
+Modify row in buffer pool
+    ↓
+Generate UNDO information
+    ↓
+Generate REDO information
+    ↓
+Transaction continues
+    ↓
+COMMIT
+
+
+
+-----------------------
+PART - 8 -- BINARY LOG
+-----------------------
+1. MySQL server-level change/event log used to record transactions/events for replication and recovery workflows.
+2. Answers "What database changes/events happened?"
+3. Primary purpose is replication and point-in-time recovery (PITR).
+4. Belongs to the MySQL server layer, rather than being an InnoDB-only log.
+5. Generated when MySQL processes changes that are configured to be written to the binary log, such as INSERT, UPDATE, and DELETE.
+6. Stores transaction/event information according to the configured binlog format:
+STATEMENT → SQL statements
+ROW → row changes
+MIXED → combination depending on the situation
+7. Exists independently of the InnoDB Undo/Redo logs; committed transaction events remain available according to binlog retention/expiration settings.
+8. Replication is a primary use.
+9. Also used for Point-in-Time Recovery (PITR) by replaying binlog events after restoring a backup.
+10. Not used for normal ROLLBACK.
+11. Not used for ROLLBACK TO SAVEPOINT.
+12. Not used for MVCC or reconstructing old row versions.
+13. Not used as the mechanism that directly recovers dirty InnoDB pages after a crash; that is the job of Redo.
+14. A transaction that is rolled back is not treated as a successfully committed transaction for replication.
+15. A transaction's binlog events are associated with the transaction and are finalized as part of the commit process.
+16. Can be used to restore a database from a backup and replay changes up to a specific time.
+17. Binlog files can eventually be expired/purged when they are no longer required by replication or recovery.
+18. Does not replace Undo or Redo; it solves a different problem.
+
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+BACKUP
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+1. WHAT IS A LOGICAL DATABASE DUMP ?
+A logical database dump is a file containing SQL statements that describe how to recreate a database and its objects and data.
+
+LOGICAL DUMP = A database represented as SQL-Level instructions.
+So the dump is a textual representation of the database.
+
+
+
+2. What a logical dump contain ?
+i. database schema / creation
+ii. table structure
+iii. table data
+iv. views
+v. stored procedure
+vi. stored functions
+vii. triggers
+viii. events
+So a logical dump can potentially represent almost the entire logical database environment. They contain above following things based on the selected options.
+
+
+
+3. What is Schema / database ?
+A schema/database in MySQL is a logical container that holds database objects such as tables, views, stored routines, triggers, and events. In MySQL, "schema" and "database" are effectively synonymous.
+
+
+
+4. Tabe Structure vs Table Data
+When MySQL Workbench exports a table, there are two fundamentally different things it can export:
+
+i. The table's structure :- Table structure means the definition of the table — essentially, how the table is designed. [create, index]
+
+ii. The table's actual rows/data :- Table data means the actual rows stored inside the table. [insert]
+
+STRUCTURE
+├── Columns
+├── Data types
+├── Primary key
+├── Foreign keys
+├── Indexes
+└── Other definitions
+
+DATA
+└── Rows
+
+
+
+5. SQL DUMP
+A SQL dump is the actual file produced by a logical export that contains SQL statements representing database objects and/or data.
+
+The important thing is that the .sql file is not the database itself. It is a collection of SQL instructions that MySQL can execute.
+
+Dump contains following based on selected options :-
+-- SET ...
+-- CREATE DATABASE ... [Present if checked "Include Create Schema"]
+-- USE ...
+-- DROP TABLE ...
+-- CREATE TABLE ...
+-- INSERT INTO ...
+-- CREATE VIEW ...
+-- CREATE PROCEDURE ...
+-- CREATE FUNCTION ...
+-- CREATE TRIGGER ...
+-- CREATE EVENT ...
+
+
+
+6. SELF CONTAINED DUMP
+In MySQL workbench data export, two important choices are provided:-
+i. Export to self-contained file
+ii. Export to dump project folder
+
+A self-contained dump stores the exported SQL in a single dump file, rather than splitting the export across multiple files. the dump is intended to contain the information necessary for the selected export within that single file.
+
+
+
+7. EXPORT DUMP TO PROJECT FOLDER
+In MySQL Workbench, Dump Project Folder is the alternative to Self-Contained File. 
+
+Dump Project Folder = one folder containing separate dump files for the exported objects/tables instead of putting everything into one SQL file.
+
+
+
+8. SELECTIVE TABLE EXPORT
+Selective table export means exporting only specific tables from a schema instead of exporting the entire schema.
+
+MySQL Workbench's SQL Data Export wizard lets you select a schema and then optionally choose specific schema objects/tables to export.
+
+
+
+9. INCLUDE CREATE SCHEMA
+This option controls whether the SQL dump contains the command to create the database/schema itself. 
+
+Export to Self-Contained File
+-- The dump is one .sql file.
+-- Create Schema is controlled by the checkbox.
+
+Export to Dump Project Folder
+-- The dump is split across files inside a folder.
+-- Create Schema is also controlled by the checkbox.
+
+
+
+10. Single-Transaction Export / Dump
+The main question is:- What happens if the database is being modified while the export is running?
+
+- Starts a transaction before reading the data.
+- Creates a consistent snapshot of InnoDB data.
+- Dump reads from that snapshot.
+- Normal INSERT, UPDATE, DELETE operations can  continue during the backup.
+- Changes committed after the snapshot was created are not visible to that backup.
+- Therefore, if:
+	Snapshot starts at 10:00
+	Backup runs until 10:20
+	Row is inserted at 10:10
+	The row will NOT be included in that backup.
+- The live database does contain the row after 10:10.
+- The backup represents the database state as seen from approximately the snapshot/start point, not the state at the moment the backup finishes.
+- If a row was committed before the snapshot, it can be included.
+- If a row is inserted after the snapshot, it is excluded.
+- This provides a consistent point-in-time view for InnoDB tables.
+- Normal application traffic can continue while the backup runs.
+- DDL operations such as ALTER TABLE, DROP TABLE, TRUNCATE TABLE, etc. can interfere with the dump.
+
+
+
+11. LOCKS 
+- READ locks on the tables being dumped.
+- The dump reads the locked tables while those locks are held.
+- Other SELECT operations can generally continue.
+- INSERT operations on locked tables have to wait.
+- UPDATE operations on locked tables have to wait.
+- DELETE operations on locked tables have to wait.
+- Other operations requiring conflicting locks also have to wait.
+- The application is therefore partially blocked, not completely stopped.
+- Once the dump releases the locks, waiting write operations can continue.
+- The tables remain stable against conflicting modifications while being dumped.
+- This can be useful for non transactional tables where a transaction snapshot is unavailable.
+- For InnoDB, single-transaction is generally preferred because it avoids blocking normal writes for the duration of the dump.
+
+
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+RESTORE
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+1. Logical Database Restore / Import = reconstructing a MySQL database by executing a logical dump containing SQL statements and/or data generated from another database.
+
+
+2. A logical dump represents the database at the logical level:
+-- Database/schema definitions
+-- Tables
+-- Columns and data types
+-- Constraints
+-- Indexes
+-- Views
+-- Stored procedures/functions
+-- Triggers
+-- Events
+-- Table data
+
+
+3. Typical use cases:
+-- Moving a database between MySQL servers
+-- Restoring a database from a dump
+-- Migrating databases
+-- Recreating development/test databases
+-- Selectively restoring particular schemas/tables
+
+
+4. In MySQL Workbench, Data Import provides a GUI around this restoration process:
+-- Select dump source
+-- Select target schema
+-- Select objects
+-- Import structure/data
+-- Execute the dump against the target server
+
+
+5. Import from Dump Project Folder = importing a logical dump that is stored as a directory containing multiple dump files rather than one .sql file. A Dump Project Folder is typically produced when MySQL Workbench performs an export using the Dump Project Folder option. 
+
+During import, Workbench:
+-- Reads the dump project's metadata/files.
+-- Determines which schemas and objects are available.
+-- Lets you select the objects to restore.
+-- Executes the required SQL against the target MySQL server.
+
+
+6. Self-Contained File = a logical dump stored as one file, typically a .sql file. Unlike a Dump Project Folder, the dump's SQL statements are contained in a single file. 
+
+
+7. You have a dump file, backup.sql and you want to import its tables/data into a particular database.
+Workbench needs to know: "If an imported object needs a target schema, which schema should I use?" 
+Solution: You select that database in Default Target Schema or create new one if don't exists.
+
+Default Target Schema is basically the fallback/default destination when the SQL being imported doesn't already specify where the object belongs. The dump's explicit schema instructions take precedence for statements that explicitly specify a schema.
+
+CREATE DATABASE + USE → USE determines the target.
+CREATE DATABASE without USE → Default Target Schema can be used for the table.
+
+
+8. When selectively restoring an object, also restore the objects required by its constraints/dependencies.
+
+
+9. Schema selection → which database/schema are you restoring from the dump?
+Object selection → which tables/views/etc. inside that schema are you restoring?
+
+
+10. Foreign-key dependency → commonly causes failure when the table is created.
+View dependency → commonly causes failure when the view is created.
+
+
+11. Structure only import, data only import and structure + data import
+
+
+12. Database objects can depend on other objects.
+Therefore, they cannot always be created in any random order. 
+
+
+13. The target MySQL server may already contain the schema or tables that the dump is trying to create. 
+
+During import, there can be conflicts at multiple levels:
+-- Database/schema already exists
+-- Table already exists
+-- View already exists
+-- Data already exists / duplicate keys
+-- Objects have incompatible definitions
+
+
+14. To avoid this use
+IF EXISTS, INSERT IGNORE, etc
+
+
+15. Problem: An import can fail because of:
+-- Existing table/schema conflicts
+-- Missing foreign-key dependencies
+-- Invalid SQL
+-- Duplicate primary/unique keys
+-- Permission errors
+-- Data type/constraint violations
+-- Connection/server errors
+
+- Workbench detects that a SQL operation failed.
+The import operation can report the error and stop/fail at that point.
+- Statements that were successfully executed before the failure may already have changed the database.
+- An import failure does not automatically mean everything that happened before the error is undone.
+
+
+16. A failed logical import does not necessarily roll back the entire import. If the statements are inside a transaction, then Transactional changes can be undone.
+
+But a logical database import contains many different types of operations. You cannot assume the entire import is one giant transaction. 
+
+If you need a clean, exact restore, prefer importing into: a new/empty schema.
+
+In case of server down from MySQL, import may remain incomplete and committed work only remains. Failed import → don't assume resume or full rollback. For a clean restore, restart into a fresh/clean schema.
+
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+EXPLAIN KEYWORD
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+EXPLAIN shows how MySQL's optimizer plans to execute a SELECT, UPDATE, DELETE, or SELECT statement. It does NOT execute the query for a normal SELECT; instead, it describes the chosen execution plan. 
+
+The purpose is to answer questions like: 
+	- Which table will MySQL access first? 
+	- Which index will it use? 
+	- How many rows does it expect to examine? 
+	- Will it scan the entire table? 
+	- Will it create a temporary table? 
+	- Is a JOIN using an efficient access method? 
+EXPLAIN is therefore one of the primary tools for diagnosing slow SQL.
+
+Basic syntax:
+	EXPLAIN SELECT * FROM Article WHERE CategoryId = 10;
+	or
+	EXPLAIN ANALYZE SELECT ...;
+
+The important distinction is:
+EXPLAIN
+	= estimated execution plan.
+
+EXPLAIN ANALYZE
+	= executes the query and reports actual execution statistics alongside 	the plan.
+
+When optimizing production SQL, EXPLAIN gives you the optimizer's expectations, while EXPLAIN ANALYZE helps you discover where those expectations are wrong.
+
+QUERY
+→ optimizer chooses table access order
+→ chooses access method for each table
+→ chooses indexes
+→ estimates rows
+→ applies filtering
+→ performs JOINs
+→ performs sorting/grouping/materialization if required
+→ produces result.
+
+Your job is to determine:
+1. Is MySQL reading too many rows?
+2. Is it using an inappropriate access method?
+3. Is the JOIN order reasonable?
+4. Is the correct index being used?
+5. Is filtering happening as early as possible?
+6. Is sorting/grouping unnecessarily expensive?
+7. Are optimizer estimates significantly different from reality?
+8. Is the query fundamentally doing more work than necessary?
+
+-- If EXPLAIN tells you article query is slow (usually by showing type: ALL and key: NULL), you have to step in and fix it.
+	-- 1. Create an Index
+	-- 2. Rewrite the Query
+	-- 3. Add Pagination
+
+
+-- (1) id -> this is execution step number.
+-- (2) select_type = SIMPLE -> it means no join, no subquery, no union, no cte, just straight forward SELECT.
+-- (3) table = Customers -> Tells which table MySQL is reading.
+-- (4) partitions = NULL -> Your table is not partitioned. Partitioning is an advanced feature where article table is split into multiple physical partitions.
+-- (5) type = ref -> type = How is MySQL going to access this table ?. 
+more than one rows expected (normal index = ref) , primary key = const (const = 1 row expected)
+-- (6) possible_keys = primaryindex -> index that could be used.
+-- (7) key = primaryindex -> After evaluating all possibilities, I chose this index.
+-- (8) key_len = 4 -> This tells how many bytes of the index MySQL used. (INT so 4)
+-- (9) ref = const -> This tells what MySQL is comparing the indexed column against. (101 is constant value used in query)
+-- (10) rows = 1 -> It is MySQL's estimate of how many rows it expects to examine.
+-- (11) filtered = 100.00 -> I expect all examined rows to satisfy the WHERE condition.
+-- (12) Extra = NULL -> No extra operations required.
+
+
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+DATE DATATYPES
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+what does timezone aware means ? 
+Ans:- "Timezone Aware" means the database actively translates the time based on who is asking for it.
+
+    Datatype    std format      size        Timezone aware ?    How it handles timezones ?
+1.    TIME	HH:MM:SS    	3 Bytes	        No	        Completely ignores dates and timezones.
+2.    DATE     YYYY-MM-DD       3 Bytes         No              Completely ignores time and timezone.
+3.  DATETIME   YYYY-MM-DD       8 Bytes         No              Stores exactly what you give it.   
+                HH:MM:SS
+4.  TIMESTAMP  YYYY-MM-DD       4 Bytes         Yes             Provides value based on timezone. 
+                HH:MM:SS
+
+-- Under the hood, MySQL always stores TIMESTAMP data in UTC. It does not matter where you live or how you configure your database; the physical bytes saved on the hard drive are strictly UTC.
+-- When you ask the database to SELECT created_at, it has to decide what timezone to convert that UTC time into. By default, a fresh MySQL installation uses the SYSTEM timezone. This means it just looks at the clock of the computer.

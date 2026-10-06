@@ -2,6 +2,7 @@
 
 -- 1. Create table
 USE db;
+DROP TABLE Customers;
 CREATE TABLE Customers (
     CustomerID INT PRIMARY KEY, -- indexing automatically
     CustomerName VARCHAR(100) NOT NULL,
@@ -43,6 +44,4 @@ DROP INDEX idx_customer_city ON Customers;
 ALTER TABLE Customers DROP INDEX idx_customer_city;
 
 -- 8. Removing primary-key index
-DROP INDEX PRIMARY ON Customers;
--- or
 ALTER TABLE Customers DROP PRIMARY KEY;

@@ -1,0 +1,169 @@
+HMAC = Hash-based Message Authentication Code
+HMAC combines:
+    - A cryptographic hash function
+    - A secret key
+    - A message
+Its purpose is to provide Integrity + Authentication.
+
+
+1. The problem HMAC Solves
+------------------------------------------------------------------------
+Suppose Alice sends Bob:
+    Transfer ₹10,000
+An attacker intercepts and changes it to:
+    Transfer ₹90,000
+Bob needs to know:
+    1. Was the message modified ?
+    2. Did it come from someone who knows the shared secret ?
+A plain hash is not enough for answering both questions.
+
+
+2. Why Normal Hash Isn't Enough ?
+------------------------------------------------------------------------
+Normal Hash can guarantee only modification of message is made or not. It cannot determine that message doesn't came from attacker. For that, we need a secret that the attacker doesn't know.
+
+
+3. Message Authentication Code (MAC)
+------------------------------------------------------------------------
+MAC = Message Authentication Code
+A MAC is a short piece of data generated from:
+    - the message
+    - a secret key
+Conceptually:
+    MAC = F(K,M)
+Where:
+    M = Message
+    K = Secret key
+    F = MAC Algorithm
+
+
+4. Complete MAC Process
+------------------------------------------------------------------------
+Assume Alice and Bob already share a secret key:
+    K = SecretKey123
+Step1 - Alice create the message
+    M = "Transfer 10,000 to Bob"
+Step2 - Alice calculates the MAC
+    Tag = MAC(M,K)
+    Suppose Tag = ABC123XYZ
+Step3 - Alice sends both
+    Message = "Transfer 10,000 to Bob"
+    Tag = ABC123XYZ
+Step4 - Bob already knows the same secret key
+    - He receives both Message and Tag sent by Alice
+    - Bob independently calculates: Tag' = MAC(K,M)
+Step5 - Bob compares Tag' == Tag
+    - If equal "The message has passed MAC verification"
+    - If different "Message may have been modified, tag may have been modified or wrong secret key may have been used"
+
+This was about the normal case where no "Attacker" was involved. Now consider a case where "Attacker" is involved.
+
+Step1 - Alice sends:
+    M = "Transfer 10,000 to Bob"
+    Tag = ABC123XYZ [MAC(K,M)]
+    Attacker intercepts it and changes it to:
+    M = "Transfer 90,000 to Attacker"
+    But Tag was generated for original message.
+Step2 - Bob receives corrupted M and Tag.
+    - Bob calculates:
+        Tag' = MAC(K,corruptedM)
+    - Tag' gets value XYZ789ABC
+Step3 - Compare Tag' with the original Tag
+    "MAC verification failed"
+    The modification is detected
+
+
+5. What security properties does MAC provide ?
+------------------------------------------------------------------------
+A. Integrity:- MAC helps detect whether the message was modified or not.
+MAC(K,M) != MAC(K,M')
+
+B. Authentication:-MAC also provides message-origin authentication based on the shared secret. If Bob receives a valid tag, it indicates that whoever generated it knew the secret key. MAC does not prove the identity of a specific person in the way a digital signature can.
+
+
+6. The attacker is assumed to
+------------------------------------------------------------------------
+- Know the message (MAC don't provide Confidentiality)
+- Know the MAC algorithm
+- Know the MAC/tag
+- Potentially modify, delete, replay, or create messages
+- Not know the secret key K
+
+
+7. Hash-based MAC
+------------------------------------------------------------------------
+MAC is a security mechanism: authenticate a message and detect modification.
+HMAC is a standardized way to construct a MAC using a cryptographic hash function such as SHA-256.
+
+
+7.1 The basic idea
+------------------------------------------------------------------------
+Suppose:
+    Message = "Transfer 10,000 to Bob"
+    Key     = K
+We want a Tag that depends on both the key and the message.
+HMAC does this using two layers of hashing:
+
+                    KEY
+                     |
+                 Normalize
+                     |
+              _______|_______
+             |              |
+        K xor ipad      K xor opad
+            |               |
+            |               |
+        + Message           |
+            |               |
+            |               |
+        Inner Hash          |
+            |               |
+            |_________ _____|
+                      |  
+                  Outer Hash  
+                    |
+                    |
+                  HMAC
+
+7.2 Why two hashes ?
+------------------------------------------------------------------------
+We might think:
+    HMAC(K,M) = H(K || M)
+Why not simply do that ?
+
+Because cryptographic hash functions such as SHA-256 have an internal structure that can make naive constructions such as Hash(K || M) unsuitable for a general-purpose MAC construction. (Length Extension Attack). HMAC avoids these problems by creating two distinct hashing contexts.
+
+
+7.3 The actual HMAC formula
+------------------------------------------------------------------------
+HMAC(K,M) = H((K' xor opad) || H((K' xor ipad) || M))
+
+K' is the Normalized Key. The original secret key isn't necessarily exactly the size required by the underlying hash function's block. So, HMAC first created a normalized key K'. For SHA-256, the hash block size is 64bytes. So, HMAC works with 64byte key block. If the key is shorter, it is padded with zeros. If the key is longer, it is first hashed, and then zero-padded to the block size.
+
+ipad means inner padding. It is a fixed byte pattern: 0x36 repeated for the entire block size. It means a full block created by repeating that exact byte over and over until it matches the hash function's block size.
+
+opad means outer padding. Its fixed byte value is: 0x5C repeated for entire block. Just like the ipad, this single byte is repeated over and over until it perfectly fills the hash function's block size.
+
+Assume:
+    K = secret key
+    M = Message
+Step1 - Normalize the key
+    Normalize Key to SHA-256 block size
+Step2 - Create the inner key
+    K' xor ipad
+Step3 - Append the message
+    Inner Hash = Kinner || M
+Step4 - Create the outer key
+    K' xor opad
+Step5 - Combine Outer Key + Inner Hash
+    This is the final HMAC
+
+ipad = 0x36 and opad = 0x5C both produce different values while xor with K'.
+So:
+    Inner operation → one key-derived context
+    Outer operation → another key-derived context
+    This separation is an important part of the security design of HMAC.
+
+HMAC uses two distinct key-derived hashing contexts to build a robust MAC construction from the underlying hash function.
+
+HMAC: Use the same secret key in two hashing stages, but make each stage see a different version of that key.

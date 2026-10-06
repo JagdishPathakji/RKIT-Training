@@ -1,0 +1,10 @@
+(*) RULES FOR SET OPERATIONS
+-- 1. Both queries must return the same number of columns.
+-- 2. Corresponding columns should have compatible data type.
+-- 3. Column names in the final result come from the first query.
+
+
+UNION :- Returns all UNIQUE rows from both queries
+UNION ALL :- Returns all rows including DUPLICATE rows
+INTERSECT :- Returns rows present in BOTH query output (supported in version 8.0.31+)
+EXCEPT :- Returns rows in first query but not in second (supported in version 8.0.31+)

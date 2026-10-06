@@ -1,0 +1,116 @@
+1. What is Hashing ?
+-----------------------------------------------------------------------
+A cryptographic hash function takes an input of any size and produces a fixed-size output called a hash or digest.
+Example:
+    Input
+      ↓
+  Hash Function
+      ↓
+  Fixed-size Hash
+
+Example using SHA-256, always produces a HASH or DIGEST of 256 bits, irrespective of whether input data is one word or 10GB file.
+
+
+2. Hashing is Deterministic
+-----------------------------------------------------------------------
+The same input always produces the same HASH. This property makes hashing useful for detecting whether data has changed or not.
+
+Even a single character change (Hello -> hello) changes the hash drastically. This is called the avalanche effect. A small input change should cause a large, unpredictable change in the output HASH.
+
+
+3. Fixed-Length output
+-----------------------------------------------------------------------
+SHA-256 Hashing Algorithm always produces a 256 bits output regardless of input size. 
+
+
+6. Why is Hashing One-Way ?
+-----------------------------------------------------------------------
+The hash function is designed so that that knowing the hash does not give you a practical way to recover the original input. A cryptographic hash is not designed to have an inverse operation.
+
+
+7. Three important security properties
+-----------------------------------------------------------------------
+1. Preimage Resistance:-
+    Given Hash = H(x)
+    It should be computationally infeasible to find x.
+    x -> H(x) is easy but H(x) -> x should be infeasible.
+
+2. Second-Preimage Resistance:-
+    Suppose you already have:
+    Message A and Hash A
+
+    An attacker should not be able to find a different message B such that:
+        Hash(Message B) == Hash(Message A)
+
+3. Collision Resistance
+    A collision means:
+        A != B but H(A) = H(B)
+    Collisions are mathematically unavoidable because the input space is effectively unlimited while the output space is finite.  The security goal is:
+        Finding a collision should be computationally infeasible.
+
+
+8. SHA-256
+-----------------------------------------------------------------------
+SHA-256 is one member of the SHA-2 family of cryptographic hash functions. It produces: 256 bit digest or 32 bytes.
+
+
+9. Hashing does not mean "Data Compression"
+-----------------------------------------------------------------------
+Compression tries to preserve enough information to reconstruct the original. Hashing doesn't work that way. It is an one-way operation.
+
+
+10. One Major Use: File Integrity
+-----------------------------------------------------------------------
+Suppose a website gives you a large file. You download:
+    file.zip
+The website publishes:
+    Expected SHA-256: ABC123....
+You calculate:
+    SHA256(downloaded_file)
+If calculated hash != Expected hash means file is different or is modified / dirty. This can detect accidental corruption or modification. 
+However, there is an important security limitation:
+    "If an attacker can modify both the file and published hash, a plain hash does not authenticate the source. That's where mechanims such as HMAC and digital signatures became important."
+
+
+11. Hashing Password
+-----------------------------------------------------------------------
+Suppose a user creates a password. Storing it directly to DB would be bad design because if the DB is leaked, the actual password is immediately exposed. Instead, a system can store a password-derived value.
+    Password --> Password Hashing Function --> Storing Hash
+When the user logs in:
+    Password --> Hash(Password) --> Compare with Hash in DB
+If they match, password is considered correct.
+
+
+12. password + Salt
+-----------------------------------------------------------------------
+Now consider if 2 users have same password. In those case, Hash output for both will also be same. To avoid this we use concept of salt.
+
+Salt is a random piece of data added to a password or input before it is run through a one-way hash function.
+
+    User A --> password123
+    User B --> password123
+
+    SHA256(password123) = same Hash value (deterministic) 
+
+If we add salt with password / input then:
+
+    User A --> password123 + SaltA --> HashA
+    User B --> password123 + SaltB --> HashB
+
+Therefore, HashA != HashB, even though passwords are identical. Its purpose is to prevent attacks that rely on precomputed password/hash mappings and to ensure identical passwords don't produce identical stored values.
+
+
+13. Important Hash Algorithms
+-----------------------------------------------------------------------
+1. MD5 
+2. SHA-1
+2. SHA-256
+3. SHA-512
+4. SHA-3
+
+
+14. Hashing vs HMAC 
+-----------------------------------------------------------------------
+The basic difference is that regular hashing uses only the data to create a unique fingerprint, while HMAC combines the data with a secret key to create that fingerprint.
+
+Hashing only proves data integrity (the data hasn't changed), while HMAC proves both data integrity and authenticity (the data hasn't changed and it came from a trusted sender).

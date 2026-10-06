@@ -1,0 +1,17 @@
+/*Usecases of using keyword in C#*/
+1. import a namespace - Makes types from a namespace available without writing the fully qualified name.
+2. create an alias for namespace / type.
+    Example: using Collections = System.Collections.Generic;
+3. automatic resource disposal - Used with objects implementing IDisposable.
+    Example classes:
+        FileStream
+        StreamReader
+        StreamWriter
+        SqlConnection
+        MySqlConnection
+        HttpResponseMessage
+        DbConnection
+/*Usecases of using keyword in C#*/
+
+
+

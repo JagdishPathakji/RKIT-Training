@@ -1,0 +1,15 @@
+C:\Users\patha\OneDrive\Desktop\Training\C#\Datatable\bin\Debug\net10.0\Datatable.exe
+C:\Users\patha\OneDrive\Desktop\Training\C#\Datatable\bin\Debug\net10.0\Datatable.deps.json
+C:\Users\patha\OneDrive\Desktop\Training\C#\Datatable\bin\Debug\net10.0\Datatable.runtimeconfig.json
+C:\Users\patha\OneDrive\Desktop\Training\C#\Datatable\bin\Debug\net10.0\Datatable.dll
+C:\Users\patha\OneDrive\Desktop\Training\C#\Datatable\bin\Debug\net10.0\Datatable.pdb
+C:\Users\patha\OneDrive\Desktop\Training\C#\Datatable\obj\Debug\net10.0\Datatable.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\patha\OneDrive\Desktop\Training\C#\Datatable\obj\Debug\net10.0\Datatable.AssemblyInfoInputs.cache
+C:\Users\patha\OneDrive\Desktop\Training\C#\Datatable\obj\Debug\net10.0\Datatable.AssemblyInfo.cs
+C:\Users\patha\OneDrive\Desktop\Training\C#\Datatable\obj\Debug\net10.0\Datatable.csproj.CoreCompileInputs.cache
+C:\Users\patha\OneDrive\Desktop\Training\C#\Datatable\obj\Debug\net10.0\Datatable.sourcelink.json
+C:\Users\patha\OneDrive\Desktop\Training\C#\Datatable\obj\Debug\net10.0\Datatable.dll
+C:\Users\patha\OneDrive\Desktop\Training\C#\Datatable\obj\Debug\net10.0\refint\Datatable.dll
+C:\Users\patha\OneDrive\Desktop\Training\C#\Datatable\obj\Debug\net10.0\Datatable.pdb
+C:\Users\patha\OneDrive\Desktop\Training\C#\Datatable\obj\Debug\net10.0\Datatable.genruntimeconfig.cache
+C:\Users\patha\OneDrive\Desktop\Training\C#\Datatable\obj\Debug\net10.0\ref\Datatable.dll

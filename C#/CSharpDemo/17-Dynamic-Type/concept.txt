@@ -1,0 +1,54 @@
+Code:
+    var a = "Hello";
+    object b = "Hello"; // every C# type ultimately derives from object
+    dynamic c = "Hello";
+
+    Console.WriteLine(a.Length); // works
+    Console.WriteLine(b.Length); // complile time error
+    Console.WriteLine(c.Length); // works 
+
+    a = 10; // error
+    b = 10; // acceptable because it is also an object 
+    c = 10; // acceptable because it is dynamic typed
+
+when the variable is typed as object and you want to access a member that exists on the actual type but not on object, you need casting.
+
+var :- Compiler figures out the type once.
+object :- Variable is treated as object; the actual value can be another type. (every C# type ultimately derives from object)
+dynamic :- The variable's operations are resolved at runtime rather than being restricted by a fixed compile-time type.
+
+
+----------------------------------------
+Runtime Binding & RuntimeBinderException
+----------------------------------------
+Binding means:
+    Determining which member/method/property an expression refers to.
+With dynamic type, this Binding happens at Runtime instead of compile time. So it is called Runtime Binding. 
+
+RuntimeBinderException is an exception thrown when the runtime cannot resolve a dynamic operation. (Ex: value.Length where value is integer).
+
+The runtime uses the CURRENT type only. 
+
+Basically, Operations involving the dynamic expression are deferred to runtime.
+Code:
+    dynamic x = "Hello";
+    var y = x.Length;
+The compiler knows x is dynamic, so it doesn't resolve Length normally. The runtime determines it.
+
+
+
+----------------------------------
+LIMITATIONS 
+----------------------------------
+Dynamic gives you flexibility by moving type checking from compile time to runtime. That flexibility comes with several costs.
+1. Loss of compile-time safety
+2. Runtime exceptions
+3. Performance overhead (resolvation of different things at runtime)
+4. Harder to understand what a variable contains
+5. Method Overload resolution can become less predictable
+
+
+-------------------------
+USAGE
+-------------------------
+1. Loosely structured data mainly

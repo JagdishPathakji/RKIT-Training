@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <!-- .NET's project template automatically makes a set of common namespaces available to your project.
+    -->
+    <Nullable>enable</Nullable>
+    <!-- Please track whether my reference types are supposed to be allowed to contain null -->
+    <!-- With nullable analysis enabled, the compiler can warn you because you're assigning null to a non-nullable string. -->
+
+    <!-- 
+    string? name = "jagdish"; nulls are allowed
+    string name = "jagdish"; nulls are not allowed
+     -->
+  </PropertyGroup>
+
+</Project>
