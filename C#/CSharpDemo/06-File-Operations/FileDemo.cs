@@ -2,8 +2,10 @@ using System;
 using System.IO;
 namespace CSharpDemo.FileDirectory;
 
+/// <summary>Represents the FileDemo type.</summary>
 public class FileDemo
 {
+    /// <summary>Runs the demonstration.</summary>
     public void Run()
     {
         ConsoleHelper.Clear();

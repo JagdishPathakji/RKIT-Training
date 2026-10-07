@@ -1,8 +1,10 @@
 using System;
 namespace CSharpDemo.DateMathString;
 
+/// <summary>Represents the MathDemo type.</summary>
 public class MathDemo
 {
+    /// <summary>Runs the demonstration.</summary>
     public void Run()
     {
         ConsoleHelper.Clear();

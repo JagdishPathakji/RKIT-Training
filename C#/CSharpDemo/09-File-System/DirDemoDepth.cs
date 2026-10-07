@@ -3,8 +3,10 @@ using System.IO;
 
 namespace CSharpDemo.FileSystem;
 
+/// <summary>Represents the DirDemoDepth type.</summary>
 public static class DirDemoDepth
 {
+    /// <summary>Runs the demonstration.</summary>
     public static void Run()
     {
         string workingDirectory = Directory.GetCurrentDirectory();

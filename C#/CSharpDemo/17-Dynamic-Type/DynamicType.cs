@@ -5,28 +5,39 @@ using Microsoft.CSharp.RuntimeBinder;
 
 namespace CSharpDemo.DynamicDemo;
 
+/// <summary>Represents the Calculator type.</summary>
 public class Calculator {
+    /// <summary>Prints an integer value with its type label.</summary>
+    /// <param name="value">The integer to print.</param>
     public void Print(int value) {
         Console.WriteLine($"Integer: {value}");
     }
 
+    /// <summary>Prints a string value with its type label.</summary>
+    /// <param name="value">The string to print.</param>
     public void Print(string value) {
         Console.WriteLine($"String: {value}");
     }
 }
 
+/// <summary>Represents the Student type.</summary>
 public class Student {
     
+    /// <summary>Gets or sets the name value.</summary>
     public string Name { get; set; }
+    /// <summary>Gets or sets the age value.</summary>
     public int Age { get; set; }
 
+    /// <summary>Prints an introduction using the student's name and age.</summary>
     public void Introduce() {
         Console.WriteLine($"Hi, I am {Name}, age {Age}.");
     }
 }
 
+/// <summary>Represents the DynamicExample type.</summary>
 public class DynamicExample {
 
+    /// <summary>Runs the demonstration.</summary>
     public static void Run() {
 
         Console.WriteLine("=== DYNAMIC TYPE DEMO ===");
@@ -77,9 +88,8 @@ public class DynamicExample {
 
 
         // 5. ExpandoObject
-        /*
-        ExpandoObject is a special .NET class that lets you dynamically add/remove properties and methods at runtime.
-        */
+        // ExpandoObject lets you dynamically add and remove members; a stored delegate can be invoked like a method.
+//
         dynamic person = new ExpandoObject();
 
         person.Name = "Jagdish";

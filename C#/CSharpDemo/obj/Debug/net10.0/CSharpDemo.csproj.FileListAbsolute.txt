@@ -91,3 +91,13 @@ C:\Users\patha\AppData\Local\Temp\CSharpDemo-menu-build\CSharpDemo.deps.json
 C:\Users\patha\AppData\Local\Temp\CSharpDemo-menu-build\CSharpDemo.runtimeconfig.json
 C:\Users\patha\AppData\Local\Temp\CSharpDemo-menu-build\CSharpDemo.dll
 C:\Users\patha\AppData\Local\Temp\CSharpDemo-menu-build\CSharpDemo.pdb
+C:\Users\patha\AppData\Local\Temp\CSharpDemo-docs-build\CSharpDemo.exe
+C:\Users\patha\AppData\Local\Temp\CSharpDemo-docs-build\CSharpDemo.deps.json
+C:\Users\patha\AppData\Local\Temp\CSharpDemo-docs-build\CSharpDemo.runtimeconfig.json
+C:\Users\patha\AppData\Local\Temp\CSharpDemo-docs-build\CSharpDemo.dll
+C:\Users\patha\AppData\Local\Temp\CSharpDemo-docs-build\CSharpDemo.pdb
+C:\Users\patha\AppData\Local\Temp\CSharpDemo-docs-final-build\CSharpDemo.exe
+C:\Users\patha\AppData\Local\Temp\CSharpDemo-docs-final-build\CSharpDemo.deps.json
+C:\Users\patha\AppData\Local\Temp\CSharpDemo-docs-final-build\CSharpDemo.runtimeconfig.json
+C:\Users\patha\AppData\Local\Temp\CSharpDemo-docs-final-build\CSharpDemo.dll
+C:\Users\patha\AppData\Local\Temp\CSharpDemo-docs-final-build\CSharpDemo.pdb

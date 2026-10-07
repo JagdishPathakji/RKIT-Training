@@ -3,8 +3,10 @@ using System.Data;
 
 namespace CSharpDemo.DataTableDemo;
 
+/// <summary>Represents the DataRowStatesDemo type.</summary>
 public class DataRowStatesDemo
 {
+    /// <summary>Runs the demonstration.</summary>
     public void Run()
     {
         ConsoleHelper.Clear();

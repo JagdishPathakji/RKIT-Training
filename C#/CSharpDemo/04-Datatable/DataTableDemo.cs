@@ -4,8 +4,10 @@ using System.Linq;
 
 namespace CSharpDemo.DataTableDemo;
 
+/// <summary>Represents the DataTableDemo type.</summary>
 public class DataTableDemo
 {
+    /// <summary>Runs the demonstration.</summary>
     public void Run()
     {
         ConsoleHelper.Clear();

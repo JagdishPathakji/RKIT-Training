@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using CSharpDemo.NamespaceAndLibraries.Helpers;
 namespace CSharpDemo.NamespaceAndLibraries;
 
+/// <summary>Represents the NamespaceDemo type.</summary>
 public class NamespaceDemo
 {
+    /// <summary>Runs the demonstration.</summary>
     public void Run()
     {
         ConsoleHelper.Clear();

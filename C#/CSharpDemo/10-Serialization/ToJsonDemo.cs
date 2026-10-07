@@ -1,30 +1,28 @@
-/*
-JSON Serialization in C#
-*/
+// JSON Serialization in C#
+//
 
-/*
-1. The problem serialization solves
-
-While an application is running, it represents data as .NET objects in memory. Example:
-    Article object
-        ArticleId: a Guid
-        Versions: a list
-        Tags: another list
-Other systems don't have direct access to that in-memory object. To store or transmit its data, the application needs a portable representation. 
-
-Serialization converts an object into a format that can be stored or sent, such as JSON.
-Deserialization reads that format and reconstructs an object.
-
-.NET object --serialize--> JSON text --store or transmit-->
-JSON text --deserialize--> .NET object
-
-JSON is a human-readable text with objects, properties, arrays and value. For example:
-    {
-        "title": "Understanding SQL Joins",
-        "versionNumber": 1,
-        "tags": ["sql", "database"]
-    }
-*/
+// 1. The problem serialization solves
+//
+// While an application is running, it represents data as .NET objects in memory. Example:
+    // Article object
+        // ArticleId: a Guid
+        // Versions: a list
+        // Tags: another list
+// Other systems don't have direct access to that in-memory object. To store or transmit its data, the application needs a portable representation.
+//
+// Serialization converts an object into a format that can be stored or sent, such as JSON.
+// Deserialization reads that format and reconstructs an object.
+//
+// .NET object --serialize--> JSON text --store or transmit-->
+// JSON text --deserialize--> .NET object
+//
+// JSON is a human-readable text with objects, properties, arrays and value. For example:
+    // {
+        // "title": "Understanding SQL Joins",
+        // "versionNumber": 1,
+        // "tags": ["sql", "database"]
+    // }
+//
 
 using System;
 using System.Collections.Generic;
@@ -34,52 +32,81 @@ using System.Text.Json.Serialization;
 
 namespace CSharpDemo.Serialization;
 
+/// <summary>Represents the ArticleExport type.</summary>
 public class ArticleExport
 {
+    /// <summary>Gets or sets the article id value.</summary>
     public Guid ArticleId { get; set; }
+    /// <summary>Gets or sets the author id value.</summary>
     public Guid AuthorId { get; set; }
+    /// <summary>Gets or sets the published version id value.</summary>
     public Guid? PublishedVersionId { get; set; }
+    /// <summary>Gets or sets the created at value.</summary>
     public DateTime CreatedAt { get; set; }
 
+    /// <summary>Gets or sets the versions value.</summary>
     public List<ArticleVersionExport> Versions { get; set; } = new();
+    /// <summary>Gets or sets the tags value.</summary>
     public List<string> Tags { get; set; } = new();
 }
 
+/// <summary>Represents the ArticleVersionExport type.</summary>
 public class ArticleVersionExport
 {
+    /// <summary>Gets or sets the version id value.</summary>
     public Guid VersionId { get; set; }
+    /// <summary>Gets or sets the version number value.</summary>
     public int VersionNumber { get; set; }
+    /// <summary>Gets or sets the title value.</summary>
     public string Title { get; set; } = "";
+    /// <summary>Gets or sets the status value.</summary>
     public ArticleStatus Status { get; set; }
+    /// <summary>Gets or sets the created at value.</summary>
     public DateTime CreatedAt { get; set; }
 
+    /// <summary>Gets or sets the content blocks value.</summary>
     public List<ContentBlockExport> ContentBlocks { get; set; } = new();
 }
 
+/// <summary>Represents the ContentBlockExport type.</summary>
 public class ContentBlockExport
 {
+    /// <summary>Gets or sets the type value.</summary>
     public ContentBlockType Type { get; set; }
+    /// <summary>Gets or sets the sequence order value.</summary>
     public int SequenceOrder { get; set; }
+    /// <summary>Gets or sets the content value.</summary>
     public string Content { get; set; } = "";
 }
 
+/// <summary>Represents the ArticleStatus type.</summary>
 public enum ArticleStatus
 {
+    /// <summary>The draft value.</summary>
     Draft,
+    /// <summary>The pending review value.</summary>
     PendingReview,
+    /// <summary>The published value.</summary>
     Published,
+    /// <summary>The rejected value.</summary>
     Rejected
 }
 
+/// <summary>Represents the ContentBlockType type.</summary>
 public enum ContentBlockType
 {
+    /// <summary>The heading value.</summary>
     Heading,
+    /// <summary>The paragraph value.</summary>
     Paragraph,
+    /// <summary>The code value.</summary>
     Code
 }
 
+/// <summary>Represents the ToJsonDemo type.</summary>
 public static class ToJsonDemo
 {
+    /// <summary>Runs the demonstration.</summary>
     public static void Run()
     {
         ArticleExport article = CreateArticle();

@@ -2,34 +2,51 @@ using ServiceStack.OrmLite;
 
 namespace CSharpDemo.OrmLiteDemo;
 
+/// <summary>Holds article, title, author, and creation data from a join query.</summary>
 public sealed class PublishedArticleJoinResult
 {
+    /// <summary>Gets or sets the article id value.</summary>
     public byte[] ArticleId { get; set; } = null!;
+    /// <summary>Gets or sets the title value.</summary>
     public string Title { get; set; } = string.Empty;
+    /// <summary>Gets or sets the username value.</summary>
     public string Username { get; set; } = string.Empty;
+    /// <summary>Gets or sets the created at value.</summary>
     public DateTime? CreatedAt { get; set; }
 }
 
+/// <summary>Holds an article ID and its optional joined category name.</summary>
 public sealed class ArticleCategoryJoinResult
 {
+    /// <summary>Gets or sets the article id value.</summary>
     public byte[] ArticleId { get; set; } = null!;
+    /// <summary>Gets or sets the category name value.</summary>
     public string? CategoryName { get; set; }
 }
 
+/// <summary>Holds a role name and its optional linked user's ID.</summary>
 public sealed class RoleUserJoinResult
 {
+    /// <summary>Gets or sets the role name value.</summary>
     public string RoleName { get; set; } = string.Empty;
+    /// <summary>Gets or sets the user id value.</summary>
     public byte[]? UserId { get; set; }
 }
 
+/// <summary>Holds an article ID and its joined tag name.</summary>
 public sealed class ArticleTagJoinResult
 {
+    /// <summary>Gets or sets the article id value.</summary>
     public byte[] ArticleId { get; set; } = null!;
+    /// <summary>Gets or sets the tag name value.</summary>
     public string TagName { get; set; } = string.Empty;
 }
 
+/// <summary>Demonstrates inner, left, and right joins across knowledge-base tables.</summary>
 public static class JoinDemo
 {
+    /// <summary>Runs the demonstration.</summary>
+    /// <param name="db">An open connection to the knowledge_base database.</param>
     public static void Run(System.Data.IDbConnection db)
     {
         Console.WriteLine("\n=== ORMLITE JOIN DEMO ===");

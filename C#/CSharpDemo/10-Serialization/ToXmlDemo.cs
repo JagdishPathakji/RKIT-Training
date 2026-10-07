@@ -1,10 +1,9 @@
-/*
-XmlWriter writes XML and lets you customize formatting, such as indentation. XmlSerializer can write through an XmlWriter, but it can also write directly to a stream or text writer.
-
-StringBuilder collected the XML text in memory so the program could print it and save it afterward.
-
-StringReader was used to give that XML string to the deserializer. It wasn’t a builder; it just lets an API read from a string.
-*/
+// XmlWriter writes XML and lets you customize formatting, such as indentation. XmlSerializer can write through an XmlWriter, but it can also write directly to a stream or text writer.
+//
+// StringBuilder collected the XML text in memory so the program could print it and save it afterward.
+//
+// StringReader was used to give that XML string to the deserializer. It wasn’t a builder; it just lets an API read from a string.
+//
 
 using System;
 using System.Collections.Generic;
@@ -18,81 +17,110 @@ using System.Xml.Serialization;
 
 namespace CSharpDemo.Serialization;
 
+/// <summary>Represents the XmlArticleExport type.</summary>
 [XmlRoot("article")]
 public class XmlArticleExport
 {
+    /// <summary>Gets or sets the article id value.</summary>
     [XmlElement("articleId")]
     public Guid ArticleId { get; set; }
 
+    /// <summary>Gets or sets the author id value.</summary>
     [XmlElement("authorId")]
     public Guid AuthorId { get; set; }
 
+    /// <summary>Gets or sets the published version id value.</summary>
     [XmlElement("publishedVersionId", IsNullable = true)]
     public Guid? PublishedVersionId { get; set; }
 
+    /// <summary>Gets or sets the created at value.</summary>
     [XmlElement("createdAt")]
     public DateTime CreatedAt { get; set; }
 
+    /// <summary>Gets or sets the versions value.</summary>
     [XmlArray("versions")]
     [XmlArrayItem("version")]
     public List<XmlArticleVersionExport> Versions { get; set; } = new();
 
+    /// <summary>Gets or sets the tags value.</summary>
     [XmlArray("tags")]
     [XmlArrayItem("tag")]
     public List<string> Tags { get; set; } = new();
 }
 
+/// <summary>Represents the XmlArticleVersionExport type.</summary>
 public class XmlArticleVersionExport
 {
+    /// <summary>Gets or sets the version id value.</summary>
     [XmlElement("versionId")]
     public Guid VersionId { get; set; }
 
+    /// <summary>Gets or sets the version number value.</summary>
     [XmlElement("versionNumber")]
     public int VersionNumber { get; set; }
 
+    /// <summary>Gets or sets the title value.</summary>
     [XmlElement("title")]
     public string Title { get; set; } = "";
 
+    /// <summary>Gets or sets the status value.</summary>
     [XmlElement("status")]
     public XmlArticleStatus Status { get; set; }
 
+    /// <summary>Gets or sets the created at value.</summary>
     [XmlElement("createdAt")]
     public DateTime CreatedAt { get; set; }
 
+    /// <summary>Gets or sets the content blocks value.</summary>
     [XmlArray("contentBlocks")]
     [XmlArrayItem("contentBlock")]
     public List<XmlContentBlockExport> ContentBlocks { get; set; } = new();
 }
 
+/// <summary>Represents the XmlContentBlockExport type.</summary>
 public class XmlContentBlockExport
 {
+    /// <summary>Gets or sets the type value.</summary>
     [XmlElement("type")]
     public XmlContentBlockType Type { get; set; }
 
+    /// <summary>Gets or sets the sequence order value.</summary>
     [XmlElement("sequenceOrder")]
     public int SequenceOrder { get; set; }
 
+    /// <summary>Gets or sets the content value.</summary>
     [XmlElement("content")]
     public string Content { get; set; } = "";
 }
 
+/// <summary>Represents the XmlArticleStatus type.</summary>
 public enum XmlArticleStatus
 {
+    /// <summary>The draft value.</summary>
     Draft,
+    /// <summary>The pending review value.</summary>
     PendingReview,
+    /// <summary>The published value.</summary>
     Published,
+    /// <summary>The rejected value.</summary>
     Rejected
 }
 
+/// <summary>Represents the XmlContentBlockType type.</summary>
 public enum XmlContentBlockType
 {
+    /// <summary>The heading value.</summary>
     Heading,
+    /// <summary>The paragraph value.</summary>
     Paragraph,
+    /// <summary>The code value.</summary>
     Code
 }
 
+/// <summary>Represents the ToXmlDemo type.</summary>
 public static class ToXmlDemo
 {
+    /// <summary>Runs the demonstration.</summary>
     public static void Run()
     {
         XmlArticleExport article = CreateArticle();

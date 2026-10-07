@@ -2,8 +2,11 @@ using ServiceStack.OrmLite;
 
 namespace CSharpDemo.OrmLiteDemo;
 
+/// <summary>Demonstrates aggregate queries over article content blocks.</summary>
 public static class AggregateDemo
 {
+    /// <summary>Runs the demonstration.</summary>
+    /// <param name="db">An open connection to the knowledge_base database.</param>
     public static void Run(System.Data.IDbConnection db)
     {
         Console.WriteLine("\n=== ORMLITE AGGREGATE DEMO: ARTICLE CONTENT SIZE ===");

@@ -3,9 +3,12 @@ using ServiceStack.OrmLite;
 
 namespace CSharpDemo.OrmLiteDemo;
 
+/// <summary>Demonstrates deleting tags by object, condition, one ID, or multiple IDs.</summary>
 public static class DeleteDemo
 {
-    // Demonstrates each delete method using temporary tag rows created by this run.
+    // Demonstrates delete methods using temporary tags and user-entered tag IDs.
+    /// <summary>Runs the demonstration.</summary>
+    /// <param name="db">An open connection to the knowledge_base database.</param>
     public static void Run(IDbConnection db)
     {
         DisplayTags(db);

@@ -3,106 +3,117 @@ using System.Linq;
 using System.Collections.Generic;
 namespace CSharpDemo.Generics;
 
-/*
-Generic Classes
-*/
+// Generic Classes
+//
 
-/*
-Without generics, we might separate classes for different types:
-class IntBox {
-    int value;
-}
-class StringBox { 
-    string value;
-}
-class DoubleBox { 
-    double value;
-}
-
-The classes are doing exactly the same thing. The only difference is the type of value. Generics solves this problem.
-*/
+// Without generics, we might separate classes for different types:
+// class IntBox {
+    // int value;
+// }
+// class StringBox {
+    // string value;
+// }
+// class DoubleBox {
+    // double value;
+// }
+//
+// The classes are doing exactly the same thing. The only difference is the type of value. Generics solves this problem.
+//
 
 
 
-/*
-Instead of creating three classes, we create one generic class.
-class Box<T> {
-    T value;
-}
-
-Here, T is a type parameter. It means: "I dont know actual type yet. The person using this class will specify it."
-
-Example:
-Box<int> b1 = new Box<int>();
-b1.value = 10;
-
-Box<string> b2 = new Box<string>();
-b2.value = "hello";
-*/
-
+// Instead of creating three classes, we create one generic class.
+// class Box<T> {
+    // T value;
+// }
+//
+// Here, T is a type parameter. It means: "I dont know actual type yet. The person using this class will specify it."
+//
+// Example:
+// Box<int> b1 = new Box<int>();
+// b1.value = 10;
+//
+// Box<string> b2 = new Box<string>();
+// b2.value = "hello";
+//
 
 
-/*
-Generic constraints restrict what types can be used for T. "T must satisfy some condition."
 
-1. where T : class
-This means T must be a reference type.
-(string allowed, int not allowed)
+// Generic constraints restrict what types can be used for T. "T must satisfy some condition."
+//
+// 1. where T : class
+// This means T must be a reference type.
+// (string allowed, int not allowed)
+//
+// class Box<T> where T : class {
+    // public T value;
+// }
+//
+//
+// 2. where T : struct
+// This means T must be a value type.
+// (int allowed, string not allowed)
+//
+// class Box<T> where T : struct {
+    // public T value;
+// }
+//
+//
+// 3. where T : SomeInterface
+// T is guaranteed to implement some interface.
+//
+// interface IEntity {
+    // int Id { get; }
+// }
+//
+// class Article : IEntity {
+    // public int Id { get; set; }
+// }
+//
+// class User : IEntity {
+    // public int Id { get; set; }
+// }
+//
+// class Repository<T> where T : IEntity {
+//
+    // public void PrintId(T entity) {
+        // Console.WriteLine(entity.Id);
+    // }
+// }
+//
+// Both Repository<Article> and Repository<User> are valid because they implement IEntity.
+//
 
-class Box<T> where T : class {
-    public T value;
-}
-
-
-2. where T : struct
-This means T must be a value type.
-(int allowed, string not allowed)
-
-class Box<T> where T : struct {
-    public T value;
-}
-
-
-3. where T : SomeInterface
-T is guaranteed to implement some interface. 
-
-interface IEntity {
-    int Id { get; }
-}
-
-class Article : IEntity {
-    public int Id { get; set; }
-}
-
-class User : IEntity { 
-    public int Id { get; set; }
-}
-
-class Repository<T> where T : IEntity {
-
-    public void PrintId(T entity) {
-        Console.WriteLine(entity.Id);
-    }
-}
-
-Both Repository<Article> and Repository<User> are valid because they implement IEntity.
-*/
-
+/// <summary>Represents the Article type.</summary>
 public class Article
 {
+    /// <summary>Gets or sets the title value.</summary>
     public string Title { get; set; } = "";
+    /// <summary>Gets or sets the author value.</summary>
     public string Author { get; set; } = "";
+    /// <summary>Gets or sets the created at value.</summary>
     public DateTime CreatedAt { get; set; }
 }
 
+/// <summary>Represents the Page type.</summary>
 public class Page<T>
 {
+    /// <summary>Gets the items on this page.</summary>
     public List<T> Items { get; }
+    /// <summary>Gets the one-based page number.</summary>
     public int PageNumber { get; }
+    /// <summary>Gets the maximum number of items per page.</summary>
     public int PageSize { get; }
+    /// <summary>Gets the total number of matching items.</summary>
     public int TotalItems { get; }
+    /// <summary>Gets the total number of pages.</summary>
     public int TotalPages { get; }
 
+    /// <summary>Creates a page of items and calculates its total page count.</summary>
+    /// <param name="items">The items on this page.</param>
+    /// <param name="pageNumber">The one-based page number.</param>
+    /// <param name="pageSize">The maximum number of items per page.</param>
+    /// <param name="totalItems">The total number of matching items.</param>
     public Page(List<T> items, int pageNumber, int pageSize, int totalItems)
     {
         Items = items;
@@ -113,8 +124,10 @@ public class Page<T>
     }
 }
 
+/// <summary>Represents the ClassDemoGen type.</summary>
 public static class ClassDemoGen
 {
+    /// <summary>Runs the demonstration.</summary>
     public static void Run()
     {
 

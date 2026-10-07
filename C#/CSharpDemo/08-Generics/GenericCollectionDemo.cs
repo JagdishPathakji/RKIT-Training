@@ -3,143 +3,147 @@ using System.Linq;
 using System.Collections.Generic;
 namespace CSharpDemo.Generics;
 
-/*
-IEnumerable<T> provides an enumerator that starts at the begining of a collection and moves forward one step at a time until it reaches the end.
-
-If a class implements `IEnumerable`, it makes a single simple promise: "You can loop through my items one by one".
-
-Because `IEnumerable<T>` is at the very bottom of the capability ladder, it is highly restricted.
--- You cannot add items
--- You cannot remove items
--- You cannot access items by an index number
--- It does not know how many items it has
-*/
+// IEnumerable<T> provides an enumerator for moving through a sequence one item at a time.
+//
+// If a class implements IEnumerable<T>, it makes a simple promise: "You can loop through my items one by one".
+//
+// IEnumerable<T> is the base interface in this collection hierarchy. It provides iteration, but does not expose methods to add, remove, or access items by index, or a Count property.
+//
 
 
 
-/*
-ICollection<T> inherits from IEnumerable<T>. That means ICollection<T> can do everything an IEnumerable<T> can do but it adds a whole new set of rules.
-
-If a class implements ICollection<T>, it promises: "You can add items, remove items, and know how many items i am holding".
-
-By using ICollection<T>, we gain access to essential methods and properties:
--- .Count: tells how many items are in the collection
--- .Add(item): puts a new item into the collection
--- Remove(item): takes a specific item out
--- Clear(): wipes the entire collection clean
--- .Contains(item): checks if a specific item exists inside the collection and returns true or false
-
-The Limitation: No Index Based Access
-ICollection<T> still does not understand the concept of position. It treats data like a bag of marbles. You know how many marbles are in the bag, and you can take a red marble out, but you cannot ask for "the 3rd marble".
-*/
-
-
-
-/*
-IList<T> inherits from ICollection<T>. This means an IList<T> is an IEnumerable<T> and an ICollection<T>. It does everything what parent classes do. 
-
-If a class implements IList<T>, it promises: "I keep all items in a specific order, and you can access or change any item instantly if you know its index number."
-
-By using IList<T>, we have following additional methods:
--- [index]: can access items via index
--- .Insert(index,item): inserts a new item into a specific position and pushing 
-everything else down
--- .RemoveAt(index): deletes whatever is at that index
--- .IndexOf(item): searches for an item and tells you its exact index number or return -1 if it is not present in the IList<T>.
-*/
+// ICollection<T> inherits from IEnumerable<T>. That means ICollection<T> can do everything an IEnumerable<T> can do but it adds a whole new set of rules.
+//
+// ICollection<T> provides methods for adding and removing items, plus a Count property. Read-only implementations may reject changes.
+//
+// By using ICollection<T>, we gain access to essential methods and properties:
+// -- .Count: tells how many items are in the collection
+// -- .Add(item): puts a new item into the collection
+// -- Remove(item): takes a specific item out
+// -- Clear(): wipes the entire collection clean
+// -- .Contains(item): checks if a specific item exists inside the collection and returns true or false
+//
+// The Limitation: No Index Based Access
+// ICollection<T> still does not understand the concept of position. It treats data like a bag of marbles. You know how many marbles are in the bag, and you can take a red marble out, but you cannot ask for "the 3rd marble".
+//
 
 
 
-/*
-IDictionary<TKey,TValue> dictates how any key-value collection must act. It also implements ICollection and indirectly IEnumerable.
-
-If a class signs the IDictionary<TKey,TValue> contract, it promises: "I map unique key to values and you can instantly look up a value if you give me its key."
-
-It forces the class to implement:
--- [key]: the key-based access like index
--- .Add(key,value): adds a new pair
--- .Contains(key): check if key is present
--- .Keys and .Values: lets you grab just the list of key or just list of values in form of ICollections. 
--- .Remove(key): removes key and value
-
-If you want to add or remove items, you must do it through the IDictionary itself (using dict.Add() or dict.Remove()). The collections returned by .Keys and .Values are strictly for looking at the data or looping through it.
-*/
+// IList<T> inherits from ICollection<T>. This means an IList<T> is an IEnumerable<T> and an ICollection<T>. It does everything what parent classes do.
+//
+// If a class implements IList<T>, it promises: "I keep items in a specific order, and you can access or change an item by its index."
+//
+// By using IList<T>, we have following additional methods:
+// -- [index]: can access items via index
+// -- .Insert(index,item): inserts a new item into a specific position and pushing
+// everything else down
+// -- .RemoveAt(index): deletes whatever is at that index
+// -- .IndexOf(item): searches for an item and tells you its exact index number or return -1 if it is not present in the IList<T>.
+//
 
 
 
-/*
-ISet<T> completely ignores order and indexing, If a class implements ISet<T>, it promises: "I absolutely will now allow duplicates, and I am optimized for math-like set operations".
-
-Properties of ISet<T>:
--- Uniqueness: If you try to add "Apple" 100 times, it will only keep one "Apple". It silently ignores duplicates.
-
--- No Order, No Index: You cannot ask for item [0]. It treats items like a chaotic bag.
-
--- Blazing Fast .Contains(): Checking if a List contains an item requires checking every single item one by one (O(N) time). A ISet uses a "hash code" to instantly know if the item is there, no matter how big the set is (O(1) time).
-*/
-
-
-
-/*
-Stack<T>: Last In First Out. It inherits IEnumerable<T> only. It has methods .Push() and .Pop() which works at top of stack.
-
-Queue<T>: First In First Out. It inherits IEnumerable<T> only. It has methods .Enqueue() which works at back and .Dequeue() which works at front of Queue. 
-*/
+// IDictionary<TKey,TValue> defines key-value collection behavior. It inherits ICollection<KeyValuePair<TKey,TValue>> and indirectly IEnumerable<KeyValuePair<TKey,TValue>>.
+//
+// If a class signs the IDictionary<TKey,TValue> contract, it promises: "I map unique keys to values, and you can look up a value using its key."
+//
+// It forces the class to implement:
+// -- [key]: the key-based access like index
+// -- .Add(key,value): adds a new pair
+// -- .Contains(key): check if key is present
+// -- .Keys and .Values: provide collections for iterating over the keys or values.
+// -- .Remove(key): removes key and value
+//
+// If you want to add or remove items, you must do it through the IDictionary itself (using dict.Add() or dict.Remove()). The collections returned by .Keys and .Values are strictly for looking at the data or looping through it.
+//
 
 
 
-/*
-IEnumerable<T>  (The Root: "I can loop through items")
-│
-├── ICollection<T>  (The Modifier: "I have a .Count, and can Add/Remove")
-│    │
-│    ├── IList<T>  (The Indexer: "I maintain order, access by [index]")
-│    │    └── List<T>
-│    │
-│    ├── IDictionary<TKey, TValue>  (The Lookup: "I map Keys to Values")
-│    │    └── Dictionary<TKey, TValue>
-│    │
-│    └── ISet<T>  (The Unique Collection: "I only allow unique items")
-│         └── HashSet<T>
-│
-└── (Direct Implementers of IEnumerable)
-    ├── Stack<T>  (LIFO: Last-In, First-Out)
-    └── Queue<T>  (FIFO: First-In, First-Out)
-*/
+// ISet<T> does not define ordering or index access. It rejects duplicate items and provides set operations.
+//
+// Properties of ISet<T>:
+// -- Uniqueness: Adding a duplicate does not add another item; Add returns false for the duplicate.
+//
+// -- No Ordering Contract or Index: ISet<T> does not promise an item order or provide access by numeric index.
+//
+// -- Contains(): List<T> checks items one by one (O(N)); HashSet<T> lookup is typically O(1) on average, but can be slower in the worst case.
+//
 
+
+
+// Stack<T>: Last In First Out. It provides Push() and Pop() operations at the top of the stack.
+//
+// Queue<T>: First In First Out. Enqueue() adds at the back and Dequeue() removes from the front of the queue.
+//
+
+
+
+// IEnumerable<T>  (The base: "I can loop through items")
+// │
+// ├── ICollection<T>  (The Modifier: "I have a .Count, and can Add/Remove")
+// │    │
+// │    ├── IList<T>  (The Indexer: "I maintain order, access by [index]")
+// │    │    └── List<T>
+// │    │
+// │    ├── IDictionary<TKey, TValue>  (The Lookup: "I map Keys to Values")
+// │    │    └── Dictionary<TKey, TValue>
+// │    │
+// │    ├── ISet<T>  (The Unique Collection: "I allow no duplicate items")
+// │    │    └── HashSet<T>
+// │    ├── Stack<T>  (LIFO: Last-In, First-Out)
+// │    └── Queue<T>  (FIFO: First-In, First-Out)
+//
+
+/// <summary>Represents the KnowledgeBaseArticle type.</summary>
 public class KnowledgeBaseArticle
 {
     // ARTICLE table
+    /// <summary>Gets or sets the article id value.</summary>
     public Guid ArticleId { get; set; }
+    /// <summary>Gets or sets the author id value.</summary>
     public Guid AuthorId { get; set; }
+    /// <summary>Gets or sets the current published version id value.</summary>
     public Guid? CurrentPublishedVersionId { get; set; }
+    /// <summary>Gets or sets the created at value.</summary>
     public DateTime CreatedAt { get; set; }
 
     // ARTICLE_VERSION rows belonging to this article.
     // Concrete class used: List<ArticleVersion>
+    /// <summary>Gets or sets the versions value.</summary>
     public IList<ArticleVersion> Versions { get; set; }
         = new List<ArticleVersion>();
 
     // TAG IDs linked through ARTICLE_TAG.
     // Concrete class used: HashSet<int>
+    /// <summary>Gets or sets the tag ids value.</summary>
     public ISet<int> TagIds { get; set; }
         = new HashSet<int>();
 }
 
+/// <summary>Represents the ArticleVersion type.</summary>
 public class ArticleVersion
 {
     // ARTICLE_VERSION table
+    /// <summary>Gets or sets the version id value.</summary>
     public Guid VersionId { get; set; }
+    /// <summary>Gets or sets the article id value.</summary>
     public Guid ArticleId { get; set; }
+    /// <summary>Gets or sets the version number value.</summary>
     public int VersionNumber { get; set; }
+    /// <summary>Gets or sets the title value.</summary>
     public string Title { get; set; } = "";
+    /// <summary>Gets or sets the status id value.</summary>
     public int StatusId { get; set; }
+    /// <summary>Gets or sets the created by value.</summary>
     public Guid CreatedBy { get; set; }
+    /// <summary>Gets or sets the created at value.</summary>
     public DateTime CreatedAt { get; set; }
 }
 
+/// <summary>Represents the GenericCollectionDemo type.</summary>
 public static class GenericCollectionDemo
 {
+    /// <summary>Runs the demonstration.</summary>
     public static void Run()
     {
 

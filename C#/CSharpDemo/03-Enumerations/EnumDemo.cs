@@ -1,35 +1,53 @@
 using System;
 namespace CSharpDemo.Enums;
 
+/// <summary>Represents the ArticleStatus type.</summary>
 public enum ArticleStatus
 {
+    /// <summary>No article status has been assigned.</summary>
     None = 0,
+    /// <summary>The article is a draft.</summary>
     Draft = 1,
+    /// <summary>The article is awaiting editor review.</summary>
     PendingEditorReview = 2,
+    /// <summary>The article needs changes before approval.</summary>
     NeedsImprovement = 3,
+    /// <summary>The article was rejected.</summary>
     Rejected = 4,
+    /// <summary>The article is published.</summary>
     Published = 5
 }
 
 
+/// <summary>Represents the Role type.</summary>
 public enum Role
 {
+    /// <summary>No role has been assigned.</summary>
     None = 0,
+    /// <summary>The user reviews articles.</summary>
     Reviewer = 1,
+    /// <summary>The user writes articles.</summary>
     Author = 2,
+    /// <summary>The user edits and approves articles.</summary>
     Editor = 3
 }
 
 
+/// <summary>Represents the BlockType type.</summary>
 public enum BlockType
 {
+    /// <summary>No block type has been assigned.</summary>
     None = 0,
+    /// <summary>The block contains regular text.</summary>
     Text = 1,
+    /// <summary>The block contains code.</summary>
     Code = 2
 }
 
+/// <summary>Represents the EnumsDemo type.</summary>
 public class EnumsDemo
 {
+    /// <summary>Runs the demonstration.</summary>
     public void Run()
     {
         ConsoleHelper.Clear();

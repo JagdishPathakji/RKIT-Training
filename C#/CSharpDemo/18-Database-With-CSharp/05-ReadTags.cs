@@ -1,8 +1,10 @@
 using MySql.Data.MySqlClient;
 namespace CSharpDemo.DatabaseWithCSharp;
 
+/// <summary>Represents the ReadTags type.</summary>
 internal static class ReadTags {
 
+    /// <summary>Runs the demonstration.</summary>
     public static void Run() {
 
         const string sql = """

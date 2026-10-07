@@ -1,8 +1,10 @@
 using System;
 namespace CSharpDemo.DateMathString;
 
+/// <summary>Represents the DateTimeDemo type.</summary>
 public class DateTimeDemo
 {
+    /// <summary>Runs the demonstration.</summary>
     public void Run()
     {
         ConsoleHelper.Clear();

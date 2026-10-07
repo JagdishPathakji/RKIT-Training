@@ -1,15 +1,22 @@
 using CSharpDemo;
 namespace CSharpDemo.ScopeAndAccessibility;
 
+/// <summary>Represents the AccessSpecifiersDemo type.</summary>
 public class AccessSpecifiersDemo
 {
+    /// <summary>Stores the value of the public field.</summary>
     public string PublicValue = "public";
     private string PrivateValue = "private";
+    /// <summary>Stores the value of the protected field.</summary>
     protected string ProtectedValue = "protected";
+    /// <summary>Stores the value of the internal field.</summary>
     internal string InternalValue = "internal";
+    /// <summary>Stores the value of the protected internal field.</summary>
     protected internal string ProtectedInternalValue = "protected internal";
+    /// <summary>Stores the value of the private protected field.</summary>
     private protected string PrivateProtectedValue = "private protected";
 
+    /// <summary>Runs the demonstration.</summary>
     public void Run()
     {
         ConsoleHelper.Clear();
@@ -39,8 +46,10 @@ public class AccessSpecifiersDemo
     }
 }
 
+/// <summary>Represents the AccessSpecifiersDerivedDemo type.</summary>
 public class AccessSpecifiersDerivedDemo : AccessSpecifiersDemo
 {
+    /// <summary>Prints the members available to a derived class.</summary>
     public void PrintAccessibleValues()
     {
         Console.WriteLine("\nInside a derived class in the same assembly:");
@@ -53,8 +62,10 @@ public class AccessSpecifiersDerivedDemo : AccessSpecifiersDemo
     }
 }
 
+/// <summary>Represents the AccessSpecifiersOtherDemo type.</summary>
 public class AccessSpecifiersOtherDemo
 {
+    /// <summary>Prints the members available to an unrelated class in this assembly.</summary>
     public void PrintAccessibleValues()
     {
         AccessSpecifiersDemo demo = new AccessSpecifiersDemo();

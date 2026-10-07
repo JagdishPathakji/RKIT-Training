@@ -4,37 +4,43 @@ using System.Linq;
 
 namespace CSharpDemo.Generics;
 
-/*
-Generic Methods
-*/
+// Generic Methods
+//
 
-/*
-The class doesn't need to e generic. Only method has a type parameter. 
+// The class doesn't need to e generic. Only method has a type parameter.
+//
+// syntax:
+// returnType methodName<T>(T parameter) {
+    // // code
+// }
+//
+// methodName<T>(argument)
+// or
+// methodname(argument) // c# automatically infers the data type
+//
 
-syntax:
-returnType methodName<T>(T parameter) {
-    // code
-}
-
-methodName<T>(argument)
-or
-methodname(argument) // c# automatically infers the data type
-*/
-
+/// <summary>Represents the UserRow type.</summary>
 public class UserRow
 {
+    /// <summary>Gets or sets the username value.</summary>
     public string Username { get; set; } = "";
+    /// <summary>Gets or sets the email value.</summary>
     public string Email { get; set; } = "";
 }
 
+/// <summary>Represents the RoleRow type.</summary>
 public class RoleRow
 {
+    /// <summary>Gets or sets the role id value.</summary>
     public int RoleId { get; set; }
+    /// <summary>Gets or sets the role name value.</summary>
     public string RoleName { get; set; } = "";
 }
 
+/// <summary>Represents the MethodDemoGen type.</summary>
 public static class MethodDemoGen
 {
+    /// <summary>Runs the demonstration.</summary>
     public static void Run()
     {
 

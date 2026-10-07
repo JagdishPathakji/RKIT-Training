@@ -2,26 +2,38 @@ using ServiceStack.OrmLite;
 
 namespace CSharpDemo.OrmLiteDemo;
 
+/// <summary>Holds an author's ID and the number of articles attributed to them.</summary>
 public sealed class ArticleCountByAuthor
 {
+    /// <summary>Gets or sets the author id value.</summary>
     public byte[] AuthorId { get; set; } = null!;
+    /// <summary>Gets or sets the total articles value.</summary>
     public long TotalArticles { get; set; }
 }
 
+/// <summary>Holds an article's ID and the number of linked tags.</summary>
 public sealed class TagCountByArticle
 {
+    /// <summary>Gets or sets the article id value.</summary>
     public byte[] ArticleId { get; set; } = null!;
+    /// <summary>Gets or sets the total tags value.</summary>
     public long TotalTags { get; set; }
 }
 
+/// <summary>Holds a user's ID and the number of comments they wrote.</summary>
 public sealed class CommentCountByUser
 {
+    /// <summary>Gets or sets the user id value.</summary>
     public byte[] UserId { get; set; } = null!;
+    /// <summary>Gets or sets the total comments value.</summary>
     public long TotalComments { get; set; }
 }
 
+/// <summary>Demonstrates grouped counts and a HAVING filter.</summary>
 public static class GroupByHavingDemo
 {
+    /// <summary>Runs the demonstration.</summary>
+    /// <param name="db">An open connection to the knowledge_base database.</param>
     public static void Run(System.Data.IDbConnection db)
     {
         Console.WriteLine("\n=== GROUP BY AND HAVING DEMO ===");

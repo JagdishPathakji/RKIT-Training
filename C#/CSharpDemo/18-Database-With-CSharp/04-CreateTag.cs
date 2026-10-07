@@ -1,8 +1,10 @@
 using MySql.Data.MySqlClient;
 namespace CSharpDemo.DatabaseWithCSharp;
 
+/// <summary>Represents the CreateTag type.</summary>
 internal static class CreateTag {
 
+    /// <summary>Runs the demonstration.</summary>
     public static void Run() {
 
         string name = TagInput.ReadName("Tag name: ");

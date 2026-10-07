@@ -5,8 +5,10 @@ using System.Collections.Generic;
 
 namespace CSharpDemo.DataTableDemo;
 
+/// <summary>Represents the DataTableToJson type.</summary>
 public class DataTableToJson {
 
+    /// <summary>Runs the demonstration.</summary>
     public static void Run() {
 
         ConsoleHelper.Clear();

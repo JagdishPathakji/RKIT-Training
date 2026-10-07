@@ -3,40 +3,62 @@ using System.Collections.Generic;
 
 namespace CSharpDemo.LambdaExpression;
 
+/// <summary>Represents the EnmArticleStatus type.</summary>
 public enum EnmArticleStatus {
 
+    /// <summary>The draft value.</summary>
     Draft,
+    /// <summary>The pending review value.</summary>
     PendingReview,
+    /// <summary>The needs improvement value.</summary>
     NeedsImprovement,
+    /// <summary>The rejected value.</summary>
     Rejected,
+    /// <summary>The published value.</summary>
     Published
 }
 
+/// <summary>Represents the EnmRole type.</summary>
 public enum EnmRole {
 
+    /// <summary>The author value.</summary>
     Author,
+    /// <summary>The reviewer value.</summary>
     Reviewer,
+    /// <summary>The editor value.</summary>
     Editor
 }
 
+/// <summary>Represents the User type.</summary>
 public class User {
 
+    /// <summary>Gets or sets the id value.</summary>
     public int Id { get; set; }
+    /// <summary>Gets or sets the name value.</summary>
     public string Name { get; set; }
+    /// <summary>Gets or sets the role value.</summary>
     public EnmRole Role { get; set; }
 }
 
+/// <summary>Represents the Article type.</summary>
 public class Article {
 
+    /// <summary>Gets or sets the id value.</summary>
     public int Id { get; set; }
+    /// <summary>Gets or sets the title value.</summary>
     public string Title { get; set; }
+    /// <summary>Gets or sets the author id value.</summary>
     public int AuthorId { get; set; }
+    /// <summary>Gets or sets the status value.</summary>
     public EnmArticleStatus Status { get; set; }
+    /// <summary>Gets or sets the view count value.</summary>
     public int ViewCount { get; set; }
 }
 
+/// <summary>Represents the LambdaExpressionDemo type.</summary>
 public class LambdaExpressionDemo {
 
+    /// <summary>Runs the demonstration.</summary>
     public static void Run() {
 
         Console.WriteLine("=== LAMBDA EXPRESSIONS DEMO ===");

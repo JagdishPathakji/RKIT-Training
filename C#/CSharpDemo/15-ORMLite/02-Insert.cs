@@ -2,8 +2,11 @@ using ServiceStack.OrmLite;
 
 namespace CSharpDemo.OrmLiteDemo;
 
+/// <summary>Demonstrates inserting tags with ORMLite.</summary>
 public static class InsertDemo
 {
+    /// <summary>Prompts for a tag name and inserts the tag with ORMLite.</summary>
+    /// <param name="db">An open connection to the knowledge_base database.</param>
     public static void RunInsert(System.Data.IDbConnection db)
     {
         Console.Write("Enter a new tag name: ");
@@ -15,6 +18,8 @@ public static class InsertDemo
         Console.WriteLine("Tag inserted.");
     }
 
+    /// <summary>Prompts for a tag name and inserts only the name column.</summary>
+    /// <param name="db">An open connection to the knowledge_base database.</param>
     public static void RunInsertOnly(System.Data.IDbConnection db)
     {
         Console.Write("Enter a new tag name for InsertOnly: ");

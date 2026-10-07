@@ -5,16 +5,23 @@ using System.Collections.Generic;
 
 namespace CSharpDemo.LINQTable;
 
+/// <summary>Represents the Article type.</summary>
 public class Article
 {
+    /// <summary>Gets or sets the article id value.</summary>
     public int ArticleId { get; set; }
+    /// <summary>Gets or sets the title value.</summary>
     public string Title { get; set; }
+    /// <summary>Gets or sets the status id value.</summary>
     public int StatusId { get; set; }
+    /// <summary>Gets or sets the author id value.</summary>
     public int AuthorId { get; set; }
 }
 
+/// <summary>Represents the DataTableDemoLinq type.</summary>
 public static class DataTableDemoLinq
 {
+    /// <summary>Runs the demonstration.</summary>
     public static void Run()
     {
         Console.WriteLine("=== LINQ WITH DATATABLE DEMO ===");
@@ -147,7 +154,7 @@ public static class DataTableDemoLinq
             })
             .ToList();
 
-        // From here on, this is a PLAIN List<Article> 
+        // From here on, this is a PLAIN List<Article>
         var publishedByAuthor101 = articles
             .Where(a => a.StatusId == 5 && a.AuthorId == 101)
             .Select(a => a.Title)

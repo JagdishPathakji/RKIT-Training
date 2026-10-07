@@ -1,6 +1,7 @@
 using System;
 namespace CSharpDemo;
 
+/// <summary>Represents the ConsoleHelper type.</summary>
 public static class ConsoleHelper
 {
     /// <summary>

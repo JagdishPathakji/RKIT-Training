@@ -2,8 +2,11 @@ using ServiceStack.OrmLite;
 
 namespace CSharpDemo.OrmLiteDemo;
 
+/// <summary>Demonstrates inserting or updating tags with ORMLite Save.</summary>
 public static class SaveDemo
 {
+    /// <summary>Runs the demonstration.</summary>
+    /// <param name="db">An open connection to the knowledge_base database.</param>
     public static void Run(System.Data.IDbConnection db)
     {
         Console.WriteLine("1. Save a new tag");

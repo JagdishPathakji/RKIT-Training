@@ -1,8 +1,10 @@
 using MySql.Data.MySqlClient;
 namespace CSharpDemo.DatabaseWithCSharp;
 
+/// <summary>Represents the DeleteTag type.</summary>
 internal static class DeleteTag {
 
+    /// <summary>Runs the demonstration.</summary>
     public static void Run() {
 
         int id = TagInput.ReadId();

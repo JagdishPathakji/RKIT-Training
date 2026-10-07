@@ -25,6 +25,7 @@ using CSharpDemo.OrmLiteDemo;
 
 class Program {
 
+    /// <summary>Runs the main menu and dispatches the selected demonstration.</summary>
     public static void Main() {
 
         while(true) {

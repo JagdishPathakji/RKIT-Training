@@ -4,8 +4,10 @@ using System.Text;
 
 namespace CSharpDemo.FileSystem;
 
+/// <summary>Represents the FileDemoDepth type.</summary>
 public static class FileDemoDepth
 {
+    /// <summary>Runs the demonstration.</summary>
     public static void Run()
     {
         string workingDirectory = Directory.GetCurrentDirectory();
@@ -106,23 +108,21 @@ public static class FileDemoDepth
         string filePath = GetFilePath(workingDirectory, "article-file-info.txt");
         FileInfo fileInfo = new(filePath);
 
-        /*
-        CreateText():
-            creates the file if it doesn't exist
-            replaces existing contents if it does exist
-            returns a StreamWriter
-        */
+        // CreateText():
+            // creates the file if it doesn't exist
+            // replaces existing contents if it does exist
+            // returns a StreamWriter
+//
         using (StreamWriter writer = fileInfo.CreateText())
         {
             writer.WriteLine("Article: Database Indexes");
             writer.WriteLine("Status: Draft");
         }
 
-        /*
-        FileInfo caches some file-system information.
-        Refresh() tells the FileInfo object:
-            "Go back to the file system and update your metadata."
-        */
+        // FileInfo caches some file-system information.
+        // Refresh() tells the FileInfo object:
+            // "Go back to the file system and update your metadata."
+//
         fileInfo.Refresh();
 
         Console.WriteLine($"Exists: {fileInfo.Exists}");
@@ -131,10 +131,9 @@ public static class FileDemoDepth
         Console.WriteLine($"Last written: {fileInfo.LastWriteTime}");
 
         Console.WriteLine("Read the file through FileInfo.OpenText():");
-        /*
-        OpenText() opens the file for text reading and returns a StreamReader.
-
-        */
+        // OpenText() opens the file for text reading and returns a StreamReader.
+//
+//
         using (StreamReader reader = fileInfo.OpenText())
         {
             Console.WriteLine(reader.ReadToEnd());
@@ -216,9 +215,8 @@ public static class FileDemoDepth
         byte[] bytesToWrite = Encoding.UTF8.GetBytes(
             "Version 2: Article update pending review");
         
-        /*
-        A FileStream provides a stream of bytes between your program and a file.
-        */
+        // A FileStream provides a stream of bytes between your program and a file.
+//
         using (FileStream stream = new(
                    filePath,
                    FileMode.Create, // Create a new file. If the file already exists, overwrite it.

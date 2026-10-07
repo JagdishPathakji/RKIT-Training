@@ -4,29 +4,44 @@ using System.Linq;
 
 namespace CSharpDemo.LINQList;
 
+/// <summary>Represents the Article type.</summary>
 public class Article
 {
+    /// <summary>Gets or sets the article id value.</summary>
     public int ArticleId { get; set; }
+    /// <summary>Gets or sets the title value.</summary>
     public string Title { get; set; }
+    /// <summary>Gets or sets the status id value.</summary>
     public int StatusId { get; set; }      // 5 = Published, 1 = Draft
+    /// <summary>Gets or sets the author id value.</summary>
     public int AuthorId { get; set; }
+    /// <summary>Gets or sets the created date value.</summary>
     public DateTime CreatedDate { get; set; }
+    /// <summary>Gets or sets the summary value.</summary>
     public string Summary { get; set; }
+    /// <summary>Gets or sets the tags value.</summary>
     public List<string> Tags { get; set; } = new List<string>();
 }
 
+/// <summary>Represents the Author type.</summary>
 public class Author
 {
+    /// <summary>Gets or sets the author id value.</summary>
     public int AuthorId { get; set; }
+    /// <summary>Gets or sets the name value.</summary>
     public string Name { get; set; }
 }
 
+/// <summary>Represents the ArticleDto type.</summary>
 public class ArticleDto
 {
+    /// <summary>Gets or sets the title value.</summary>
     public string Title { get; set; }
+    /// <summary>Gets or sets the author name value.</summary>
     public string AuthorName { get; set; }
 }
 
+/// <summary>Represents the ListDemoLinq type.</summary>
 public static class ListDemoLinq
 {
     static List<Article> articles = new List<Article>
@@ -48,6 +63,7 @@ public static class ListDemoLinq
         new Author { AuthorId = 104, Name = "Zoya" },
     };
 
+    /// <summary>Runs the demonstration.</summary>
     public static void Run()
     {
         Console.WriteLine("=== LINQ WITH LIST DEMO ===");
@@ -216,7 +232,7 @@ public static class ListDemoLinq
             .ToList();
         Print("4) Sorted by StatusId, then CreatedDate descending:", byStatusThenNewest);
 
-        // IMPORTANT: don't chain OrderBy().OrderBy() to add a second key 
+        // IMPORTANT: don't chain OrderBy().OrderBy() to add a second key
         // the second OrderBy() call REPLACES the first sort instead of adding to it.
         // Always use ThenBy()/ThenByDescending() after the first OrderBy()/OrderByDescending().
     }
@@ -336,7 +352,7 @@ public static class ListDemoLinq
         Console.WriteLine();
 
         // NOTE: Contains() on a list of OBJECTS (like List<Article>) checks reference/equality,
-        // not a specific property 
+        // not a specific property
         
     }
 

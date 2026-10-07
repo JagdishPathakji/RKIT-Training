@@ -4,26 +4,27 @@ namespace CSharpDemo.FileDirectory;
 
 // add commenting as per guidelines
 
-/*
-Path.Combine and Path.Join both build a path from parts, but they handle a later rooted path differently.
+// Path.Combine and Path.Join both build a path from parts, but they handle a later rooted path differently.
+//
+//
+// 1. Path.Combine:- Combine treats D:\DB as a complete path, so it discards the earlier part.
+//
+// Path.Combine(@"C:\Training", @"DB");
+// // C:\Training\DB
+//
+// Path.Combine(@"C:\Training", @"D:\DB");
+// // D:\DB
+//
+// 2. Path.Join:- Join concatenates the parts; it doesn’t treat the second rooted path as a replacement.
+//
+// Path.Join(@"C:\Training", @"D:\DB");
+// // C:\Training\D:\DB
+//
 
-
-1. Path.Combine:- Combine treats D:\DB as a complete path, so it discards the earlier part.
-
-Path.Combine(@"C:\Training", @"DB");
-// C:\Training\DB
-
-Path.Combine(@"C:\Training", @"D:\DB");
-// D:\DB
-
-2. Path.Join:- Join concatenates the parts; it doesn’t treat the second rooted path as a replacement.
-
-Path.Join(@"C:\Training", @"D:\DB");
-// C:\Training\D:\DB
-*/
-
+/// <summary>Represents the DirectoryDemo type.</summary>
 public class DirectoryDemo
 {
+    /// <summary>Runs the demonstration.</summary>
     public void Run()
     {
         ConsoleHelper.Clear();

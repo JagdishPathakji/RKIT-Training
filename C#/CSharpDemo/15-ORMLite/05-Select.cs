@@ -2,14 +2,20 @@ using ServiceStack.OrmLite;
 
 namespace CSharpDemo.OrmLiteDemo;
 
+/// <summary>Holds the category ID and name returned by a projected query.</summary>
 public sealed class CategorySelectResult
 {
+    /// <summary>Gets or sets the category id value.</summary>
     public int CategoryId { get; set; }
+    /// <summary>Gets or sets the name value.</summary>
     public string Name { get; set; } = string.Empty;
 }
 
+/// <summary>Demonstrates ORMLite selection, filtering, and table display.</summary>
 public static class SelectDemo
 {
+    /// <summary>Displays all tables.</summary>
+    /// <param name="db">An open connection to the knowledge_base database.</param>
     public static void ShowAllTables(System.Data.IDbConnection db)
     {
         Console.WriteLine("\n=== ALL KNOWLEDGE_BASE TABLES ===");
@@ -77,6 +83,8 @@ public static class SelectDemo
 
     }
 
+    /// <summary>Runs the demonstration.</summary>
+    /// <param name="db">An open connection to the knowledge_base database.</param>
     public static void Run(System.Data.IDbConnection db)
     {
         Console.WriteLine("\n=== ORMLITE SELECT DEMO ===");

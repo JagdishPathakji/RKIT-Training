@@ -3,9 +3,12 @@ using ServiceStack.OrmLite;
 
 namespace CSharpDemo.OrmLiteDemo;
 
+/// <summary>Demonstrates full-row Update and field-limited UpdateOnly on a selected user.</summary>
 public static class UpdateDemo
 {
     // Demonstrates Update and UpdateOnly on an existing user row.
+    /// <summary>Runs the demonstration.</summary>
+    /// <param name="db">An open connection to the knowledge_base database.</param>
     public static void Run(IDbConnection db)
     {
         List<User> users = db.Select<User>();

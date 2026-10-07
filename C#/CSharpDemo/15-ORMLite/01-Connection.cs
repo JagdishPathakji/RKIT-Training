@@ -4,11 +4,14 @@ using ServiceStack.OrmLite.MySql;
 
 namespace CSharpDemo.OrmLiteDemo;
 
+/// <summary>Creates and opens connections to the knowledge_base MySQL database.</summary>
 public static class KnowledgeBaseConnection
 {
     private const string ConnectionStringEnvironmentVariable =
         "KNOWLEDGE_BASE_CONNECTION_STRING";
 
+    /// <summary>Creates a factory configured for the knowledge_base MySQL database.</summary>
+    /// <returns>A factory that can open database connections.</returns>
     public static OrmLiteConnectionFactory CreateFactory()
     {
         string? connectionString =
@@ -26,6 +29,8 @@ public static class KnowledgeBaseConnection
             MySqlDialect.Provider);
     }
 
+    /// <summary>Opens a connection and verifies it targets knowledge_base.</summary>
+    /// <returns>An open connection to the knowledge_base database.</returns>
     public static IDbConnection Open()
     {
         IDbConnection db = CreateFactory().Open();
