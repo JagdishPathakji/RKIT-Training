@@ -17,6 +17,10 @@ using CSharpDemo.ExtensionMethod;
 using CSharpDemo.Types;
 using CSharpDemo.LINQList;
 using CSharpDemo.LINQTable;
+using CSharpDemo.Generics;
+using CSharpDemo.BaseLibrary;
+using CSharpDemo.Serialization;
+using CSharpDemo.FileSystem;
 
 class Program {
 
@@ -35,6 +39,10 @@ class Program {
             Console.WriteLine("05-Date-Math-String");
             Console.WriteLine("06-File-Operations");
             Console.WriteLine("07-Types (Abstract, Sealed, Interfaces)");
+            Console.WriteLine("08-Generics");
+            Console.WriteLine("09-File-System");
+            Console.WriteLine("10-Serialization");
+            Console.WriteLine("11-Base-Libraries");
             Console.WriteLine("12-Lambda-Expressions");
             Console.WriteLine("13-Extension-Methods");
             Console.WriteLine("14-LINQ");
@@ -68,6 +76,18 @@ class Program {
                         break;
                 case "7":
                         Call7();
+                        break;
+                case "8":
+                        Call8();
+                        break;
+                case "9":
+                        Call9();
+                        break;
+                case "10":
+                        Call10();
+                        break;
+                case "11":
+                        Call11();
                         break;
                 case "12":
                         Call12();
@@ -144,6 +164,58 @@ class Program {
         SealedDemo.Run();
         ConsoleHelper.Clear();
         InterfaceDemo.Run();
+    }
+
+    static void Call8() {
+
+        ConsoleHelper.Clear();
+        MethodDemoGen.Run();
+        Console.WriteLine("\nPress Enter to view the generic class demo...");
+        Console.ReadLine();
+
+        ConsoleHelper.Clear();
+        ClassDemoGen.Run();
+        Console.WriteLine("\nPress Enter to return to the main menu...");
+        Console.ReadLine();
+
+        ConsoleHelper.Clear();
+        GenericCollectionDemo.Run();
+        Console.WriteLine("\nPress Enter to return to the main menu...");
+        Console.ReadLine();
+    }
+
+    static void Call9() {
+
+        ConsoleHelper.Clear();
+        FileDemoDepth.Run();
+        Console.WriteLine("\nPress Enter to return to the main menu...");
+        Console.ReadLine();
+
+        ConsoleHelper.Clear();
+        DirDemoDepth.Run();
+        Console.WriteLine("\nPress Enter to return to the main menu...");
+        Console.ReadLine();
+    }
+
+    static void Call10() {
+
+        ConsoleHelper.Clear();
+        ToJsonDemo.Run();
+        Console.WriteLine("\nPress Enter to return to the main menu...");
+        Console.ReadLine();
+
+        ConsoleHelper.Clear();
+        ToXmlDemo.Run();
+        Console.WriteLine("\nPress Enter to return to the main menu...");
+        Console.ReadLine();
+    }
+
+    static void Call11() {
+        
+        ConsoleHelper.Clear();
+        BaseLibDemo.Run();
+        Console.WriteLine("\nPress Enter to return to the main menu...");
+        Console.ReadLine();
     }
 
     static void Call12() {

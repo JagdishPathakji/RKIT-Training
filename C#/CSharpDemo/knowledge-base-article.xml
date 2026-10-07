@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-16"?>
+<article xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <articleId>7a056fb1-50c9-4cf1-b479-ec0d0e63cd95</articleId>
+  <authorId>d754d1f5-9c7f-42ca-a0d7-144737f50ed0</authorId>
+  <publishedVersionId>8df08ae3-e749-4144-aa30-f409bd98b89a</publishedVersionId>
+  <createdAt>2026-10-01T08:30:00Z</createdAt>
+  <versions>
+    <version>
+      <versionId>8df08ae3-e749-4144-aa30-f409bd98b89a</versionId>
+      <versionNumber>1</versionNumber>
+      <title>Understanding SQL Joins</title>
+      <status>Published</status>
+      <createdAt>2026-10-01T08:30:00Z</createdAt>
+      <contentBlocks>
+        <contentBlock>
+          <type>Heading</type>
+          <sequenceOrder>1</sequenceOrder>
+          <content>What is a join?</content>
+        </contentBlock>
+        <contentBlock>
+          <type>Paragraph</type>
+          <sequenceOrder>2</sequenceOrder>
+          <content>A join combines related rows from database tables.</content>
+        </contentBlock>
+        <contentBlock>
+          <type>Code</type>
+          <sequenceOrder>3</sequenceOrder>
+          <content>SELECT * FROM USER_ROLE;</content>
+        </contentBlock>
+      </contentBlocks>
+    </version>
+  </versions>
+  <tags>
+    <tag>sql</tag>
+    <tag>database</tag>
+    <tag>tutorial</tag>
+  </tags>
+</article>

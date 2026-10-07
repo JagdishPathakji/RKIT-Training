@@ -1,0 +1,56 @@
+{
+  "articleId": "495c3218-cb75-4242-9885-b8ccd4e2cf9e",
+  "authorId": "c2d68887-a4f6-4826-ae9e-abe7567982d6",
+  "publishedVersionId": "90fe525f-d27f-42eb-b419-51354d180ad6",
+  "createdAt": "2026-10-01T08:30:00Z",
+  "versions": [
+    {
+      "versionId": "90fe525f-d27f-42eb-b419-51354d180ad6",
+      "versionNumber": 1,
+      "title": "Understanding SQL Joins",
+      "status": "Published",
+      "createdAt": "2026-10-01T08:30:00Z",
+      "contentBlocks": [
+        {
+          "type": "Heading",
+          "sequenceOrder": 1,
+          "content": "What is a join?"
+        },
+        {
+          "type": "Paragraph",
+          "sequenceOrder": 2,
+          "content": "A join combines related rows from database tables."
+        },
+        {
+          "type": "Code",
+          "sequenceOrder": 3,
+          "content": "SELECT * FROM USER_ROLE;"
+        }
+      ]
+    },
+    {
+      "versionId": "a6ab641d-272e-4649-bff4-5dbbc4f3235f",
+      "versionNumber": 2,
+      "title": "Understanding SQL Joins: Updated",
+      "status": "PendingReview",
+      "createdAt": "2026-10-05T10:00:00Z",
+      "contentBlocks": [
+        {
+          "type": "Heading",
+          "sequenceOrder": 1,
+          "content": "What is a join?"
+        },
+        {
+          "type": "Paragraph",
+          "sequenceOrder": 2,
+          "content": "This revised version includes more examples."
+        }
+      ]
+    }
+  ],
+  "tags": [
+    "sql",
+    "database",
+    "tutorial"
+  ]
+}

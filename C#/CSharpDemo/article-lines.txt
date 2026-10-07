@@ -1,0 +1,4 @@
+﻿Understanding SQL Joins
+Author: Asha
+Status: Published
+Tag: database
