@@ -1,0 +1,395 @@
+AES IN C# WITH AES-GCM
+======================
+
+This file applies AES concepts to .NET. It uses the built-in
+System.Security.Cryptography APIs and a knowledge-base article export.
+The code is an educational example: its key exists only in memory for one run.
+
+
+1. WHAT THE PROGRAM WILL DO
+---------------------------
+
+The demo will:
+    1. Create a sample article and serialize it as JSON text.
+    2. Convert that text to UTF-8 bytes.
+    3. Generate a random AES-256 key and a fresh 12-byte nonce.
+    4. Encrypt with AES-GCM and produce a 16-byte authentication tag.
+    5. Save the nonce, tag, and ciphertext (not the key) as a JSON envelope.
+    6. Read the envelope, decrypt and verify it, then deserialize the article.
+    7. Change a ciphertext byte and demonstrate that authentication fails.
+
+The demo key is lost when the program ends, so the saved example cannot be
+decrypted by a later run. This is intentional to avoid teaching a hard-coded
+or plaintext key-file pattern. A real application must retrieve keys securely.
+
+
+2. COMPLETE EXAMPLE
+-------------------
+
+Put this in a separate C# file or adapt the class names if your project already
+defines types with the same names. The project targets modern .NET, where
+AesGcm is built in.
+
+    using System;
+    using System.IO;
+    using System.Security.Cryptography;
+    using System.Text;
+    using System.Text.Json;
+    using System.Text.Json.Serialization;
+
+    namespace CSharpDemo.Cryptography;
+
+    public class ArticleExportForEncryption
+    {
+        public Guid ArticleId { get; set; }
+        public Guid AuthorId { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public string Title { get; set; } = "";
+        public string Status { get; set; } = "";
+        public string[] Tags { get; set; } = Array.Empty<string>();
+        public string[] ContentBlocks { get; set; } = Array.Empty<string>();
+    }
+
+    public class EncryptedArticleFile
+    {
+        public int FormatVersion { get; set; }
+        public string Algorithm { get; set; } = "";
+        public string Nonce { get; set; } = "";
+        public string Tag { get; set; } = "";
+        public string Ciphertext { get; set; } = "";
+    }
+
+    public static class AesGcmArticleDemo
+    {
+        private const int AesKeySizeInBytes = 32;
+        private const int NonceSizeInBytes = 12;
+        private const int TagSizeInBytes = 16;
+
+        public static void Run()
+        {
+            byte[] key = RandomNumberGenerator.GetBytes(AesKeySizeInBytes);
+            byte[]? plaintextBytes = null;
+            byte[]? ciphertext = null;
+            byte[]? tag = null;
+
+            try
+            {
+                ArticleExportForEncryption article = CreateArticle();
+
+                JsonSerializerOptions jsonOptions = new()
+                {
+                    WriteIndented = true,
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    Converters = { new JsonStringEnumConverter() }
+                };
+
+                string articleJson =
+                    JsonSerializer.Serialize(article, jsonOptions);
+                plaintextBytes = Encoding.UTF8.GetBytes(articleJson);
+
+                byte[] nonce =
+                    RandomNumberGenerator.GetBytes(NonceSizeInBytes);
+                ciphertext = new byte[plaintextBytes.Length];
+                tag = new byte[TagSizeInBytes];
+
+                using (AesGcm aes = new AesGcm(key, TagSizeInBytes))
+                {
+                    aes.Encrypt(nonce, plaintextBytes, ciphertext, tag);
+                }
+
+                EncryptedArticleFile encryptedFile = new EncryptedArticleFile
+                {
+                    FormatVersion = 1,
+                    Algorithm = "AES-256-GCM",
+                    Nonce = Convert.ToBase64String(nonce),
+                    Tag = Convert.ToBase64String(tag),
+                    Ciphertext = Convert.ToBase64String(ciphertext)
+                };
+
+                string envelopeJson =
+                    JsonSerializer.Serialize(encryptedFile, jsonOptions);
+
+                string filePath = Path.Combine(
+                    Directory.GetCurrentDirectory(),
+                    "encrypted-article.json");
+
+                File.WriteAllText(filePath, envelopeJson, Encoding.UTF8);
+
+                Console.WriteLine("Encrypted article envelope:");
+                Console.WriteLine(envelopeJson);
+                Console.WriteLine($"\nSaved to: {filePath}");
+
+                EncryptedArticleFile loadedFile =
+                    JsonSerializer.Deserialize<EncryptedArticleFile>(
+                        File.ReadAllText(filePath, Encoding.UTF8),
+                        jsonOptions)
+                    ?? throw new JsonException(
+                        "The encrypted file did not contain an envelope.");
+
+                byte[] loadedNonce =
+                    Convert.FromBase64String(loadedFile.Nonce);
+                byte[] loadedTag =
+                    Convert.FromBase64String(loadedFile.Tag);
+                byte[] loadedCiphertext =
+                    Convert.FromBase64String(loadedFile.Ciphertext);
+                byte[] decryptedBytes = new byte[loadedCiphertext.Length];
+
+                using (AesGcm aes = new AesGcm(key, TagSizeInBytes))
+                {
+                    aes.Decrypt(
+                        loadedNonce,
+                        loadedCiphertext,
+                        loadedTag,
+                        decryptedBytes);
+                }
+
+                ArticleExportForEncryption restoredArticle =
+                    JsonSerializer.Deserialize<ArticleExportForEncryption>(
+                        Encoding.UTF8.GetString(decryptedBytes),
+                        jsonOptions)
+                    ?? throw new JsonException(
+                        "The decrypted JSON did not contain an article.");
+
+                Console.WriteLine("\nDecrypted article:");
+                Console.WriteLine($"Title: {restoredArticle.Title}");
+                Console.WriteLine($"Status: {restoredArticle.Status}");
+                Console.WriteLine($"Tags: {string.Join(", ", restoredArticle.Tags)}");
+
+                DemonstrateTamperDetection(
+                    key,
+                    loadedNonce,
+                    loadedTag,
+                    loadedCiphertext);
+            }
+            catch (CryptographicException exception)
+            {
+                Console.WriteLine(
+                    $"Encryption, decryption, or authentication failed: {exception.Message}");
+            }
+            catch (JsonException exception)
+            {
+                Console.WriteLine($"Invalid JSON data: {exception.Message}");
+            }
+            catch (FormatException exception)
+            {
+                Console.WriteLine(
+                    $"Encrypted envelope contains invalid Base64: {exception.Message}");
+            }
+            catch (IOException exception)
+            {
+                Console.WriteLine($"File operation failed: {exception.Message}");
+            }
+            catch (UnauthorizedAccessException exception)
+            {
+                Console.WriteLine($"Permission denied: {exception.Message}");
+            }
+            finally
+            {
+                CryptographicOperations.ZeroMemory(key);
+
+                if (plaintextBytes != null)
+                {
+                    CryptographicOperations.ZeroMemory(plaintextBytes);
+                }
+
+                if (ciphertext != null)
+                {
+                    CryptographicOperations.ZeroMemory(ciphertext);
+                }
+
+                if (tag != null)
+                {
+                    CryptographicOperations.ZeroMemory(tag);
+                }
+            }
+        }
+
+        private static void DemonstrateTamperDetection(
+            byte[] key,
+            byte[] nonce,
+            byte[] tag,
+            byte[] ciphertext)
+        {
+            Console.WriteLine("\nTampering test:");
+
+            byte[] alteredCiphertext = (byte[])ciphertext.Clone();
+            alteredCiphertext[0] ^= 1;
+            byte[] output = new byte[alteredCiphertext.Length];
+
+            try
+            {
+                using (AesGcm aes = new AesGcm(key, TagSizeInBytes))
+                {
+                    aes.Decrypt(nonce, alteredCiphertext, tag, output);
+                }
+
+                Console.WriteLine("Unexpected: altered data passed verification.");
+            }
+            catch (CryptographicException)
+            {
+                Console.WriteLine(
+                    "Expected result: modified ciphertext failed authentication.");
+            }
+            finally
+            {
+                CryptographicOperations.ZeroMemory(alteredCiphertext);
+                CryptographicOperations.ZeroMemory(output);
+            }
+        }
+
+        private static ArticleExportForEncryption CreateArticle()
+        {
+            return new ArticleExportForEncryption
+            {
+                ArticleId = Guid.NewGuid(),
+                AuthorId = Guid.NewGuid(),
+                CreatedAt = new DateTime(
+                    2026, 10, 7, 8, 0, 0, DateTimeKind.Utc),
+                Title = "Understanding SQL Joins",
+                Status = "PrivateDraft",
+                Tags = new[] { "sql", "database" },
+                ContentBlocks = new[]
+                {
+                    "A join combines related rows from tables.",
+                    "Review the join condition before publishing."
+                }
+            };
+        }
+    }
+
+
+3. FOLLOW THE DATA THROUGH THE CODE
+-----------------------------------
+
+RandomNumberGenerator.GetBytes(32)
+    Creates a cryptographically secure random 32-byte key. Thirty-two bytes
+    equal 256 bits, so this demo uses AES-256. Never replace this with a
+    predictable value such as a username or a string literal.
+
+RandomNumberGenerator.GetBytes(12)
+    Creates a fresh 12-byte nonce. It is not a secret. The rule is uniqueness
+    for each encryption under the same key.
+
+Encoding.UTF8.GetBytes(articleJson)
+    Converts the JSON characters into bytes. Cryptographic APIs operate on
+    bytes, not C# strings.
+
+new AesGcm(key, TagSizeInBytes)
+    Creates an AES-GCM instance. Modern .NET asks for the tag size when
+    constructing the AesGcm object.
+
+aes.Encrypt(nonce, plaintextBytes, ciphertext, tag)
+    Encrypts the plaintext bytes. The caller provides output arrays for the
+    ciphertext and tag. The nonce, key, and tag are required later to decrypt.
+
+Convert.ToBase64String(...)
+    Converts arbitrary bytes into printable text for the JSON envelope.
+    Base64 is encoding, not encryption: it does not protect secrets.
+
+aes.Decrypt(...)
+    Decrypts and checks the authentication tag. If the tag is invalid, this
+    throws CryptographicException. The application must not use the output as
+    valid plaintext unless decryption succeeded.
+
+CryptographicOperations.ZeroMemory(...)
+    Clears sensitive byte arrays as far as the runtime can guarantee. It is
+    good hygiene, but it does not erase every possible copy created elsewhere
+    (for example, immutable strings such as articleJson).
+
+
+4. WHY THE ENVELOPE STORES THESE VALUES
+---------------------------------------
+
+The JSON file stores:
+
+    FormatVersion - lets a future application recognize this envelope layout.
+    Algorithm - identifies the expected algorithm and parameters.
+    Nonce - needed to decrypt; not a secret.
+    Tag - needed to verify authenticity and integrity.
+    Ciphertext - protected article JSON bytes, represented as Base64 text.
+
+The AES key is deliberately absent. The demo can decrypt only because the key
+is still in memory. A real system gets the key from a protected key-management
+service or another carefully designed secret store.
+
+The algorithm string is descriptive metadata, not proof that the input is
+safe. Validate supported format versions and expected lengths before
+processing untrusted envelopes. Consider authenticating important envelope
+metadata as AAD in a production format so it cannot be silently substituted.
+
+
+5. WHY THE MODIFIED CIPHERTEXT FAILS
+------------------------------------
+
+The tampering example clones the ciphertext and flips one bit. It then asks
+AES-GCM to decrypt using the original nonce and tag. The ciphertext no longer
+matches the tag, so verification fails and .NET throws CryptographicException.
+
+Do not catch that error and continue with the output buffer as if it contained
+a valid article. Treat the entire encrypted message as rejected.
+
+
+6. IMPORTANT LIMITATION OF THIS DEMO
+------------------------------------
+
+Every run generates a new key. The output file does not contain that key, so a
+later program run cannot decrypt a file created by an earlier run. This is a
+deliberate teaching choice, not a production storage design.
+
+To decrypt later, a real application must:
+    - Store/retrieve the key through a secure key-management solution.
+    - Associate the encrypted envelope with the key that was used, usually by
+      storing a non-secret key identifier.
+    - Define access, backup, recovery, and rotation procedures.
+
+Do not save the key in the same JSON file or beside it in plain text. Do not
+commit it to source control. Do not print it in logs.
+
+
+7. ERRORS AND VALIDATION
+------------------------
+
+CryptographicException
+    Wrong key, altered ciphertext/tag, invalid parameters, or other crypto
+    failure. Do not reveal detailed decryption diagnostics to untrusted remote
+    callers if doing so would create an oracle for attacks.
+
+JsonException
+    Envelope JSON or decrypted article JSON could not be parsed.
+
+FormatException
+    A Base64 field was malformed.
+
+IOException / UnauthorizedAccessException
+    Reading or writing the file failed.
+
+Before processing untrusted files, also validate size limits, supported
+format version, exact nonce/tag lengths, and required fields. The demo is for
+learning; production import code should have an explicit input-validation
+policy.
+
+
+8. WHEN TO USE AES-GCM FOR THIS PROJECT
+---------------------------------------
+
+Use it when a requirement says that selected article data must remain
+confidential if a file/export/backup is copied or stored outside the normal
+authorization boundary. It is not needed merely because the project has JSON
+or XML.
+
+AES does not replace:
+    - User authentication and role checks.
+    - Database permissions.
+    - HTTPS/TLS for network traffic.
+    - Password hashing.
+    - RSA signatures when a public verification key must verify a signer.
+
+
+9. SUMMARY
+----------
+
+AES-GCM encrypts byte data and authenticates it.
+Save nonce + tag + ciphertext; keep the key elsewhere.
+Use a fresh unique nonce for each encryption with the same key.
+If authentication fails, reject the data.
+This demo's in-memory key is intentionally not reusable across runs.

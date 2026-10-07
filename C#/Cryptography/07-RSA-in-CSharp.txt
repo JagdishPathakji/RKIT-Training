@@ -1,0 +1,257 @@
+RSA IN C#:
+KEYS, ENCRYPTION, AND DIGITAL SIGNATURES
+========================================
+
+This file shows RSA-2048 using .NET's RSA API. It demonstrates:
+    - Generating a key pair.
+    - Exporting public and private key text for a learning example.
+    - Importing keys.
+    - Encrypting a short value with RSA-OAEP-SHA256.
+    - Signing and verifying knowledge-base article JSON with RSA-PSS-SHA256.
+    - Detecting changed article data.
+
+The keys are generated in memory for the demo. Do not use the example's
+private-key export behavior as production key storage.
+
+
+1. COMPLETE DEMO
+----------------
+
+    using System;
+    using System.Security.Cryptography;
+    using System.Text;
+    using System.Text.Json;
+
+    namespace CSharpDemo.Cryptography;
+
+    public class ArticleExportForRsa
+    {
+        public Guid ArticleId { get; set; }
+        public Guid AuthorId { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public string Title { get; set; } = "";
+        public string Status { get; set; } = "";
+    }
+
+    public static class RsaArticleDemo
+    {
+        public static void Run()
+        {
+            try
+            {
+                ArticleExportForRsa article = new ArticleExportForRsa
+                {
+                    ArticleId = Guid.NewGuid(),
+                    AuthorId = Guid.NewGuid(),
+                    CreatedAt = new DateTime(
+                        2026, 10, 7, 9, 0, 0, DateTimeKind.Utc),
+                    Title = "Understanding Database Indexes",
+                    Status = "Published"
+                };
+
+                byte[] articleBytes = Encoding.UTF8.GetBytes(
+                    JsonSerializer.Serialize(article));
+
+                using (RSA rsa = RSA.Create(2048))
+                {
+                    string publicKeyPem = rsa.ExportSubjectPublicKeyInfoPem();
+                    string privateKeyPem = rsa.ExportPkcs8PrivateKeyPem();
+
+                    Console.WriteLine("Generated an RSA-2048 key pair.");
+                    Console.WriteLine(
+                        $"Public key PEM characters: {publicKeyPem.Length}");
+                    Console.WriteLine(
+                        $"Private key PEM characters: {privateKeyPem.Length}");
+
+                    // Import the public key into a separate RSA instance.
+                    using RSA recipientPublicKey = RSA.Create();
+                    recipientPublicKey.ImportFromPem(publicKeyPem);
+
+                    // RSA can encrypt only a small payload. Use this for
+                    // demonstrating encryption; file 08 uses it for an AES key.
+                    byte[] shortSecret = Encoding.UTF8.GetBytes("Small secret");
+                    byte[] encryptedSecret = recipientPublicKey.Encrypt(
+                        shortSecret,
+                        RSAEncryptionPadding.OaepSHA256);
+
+                    byte[] decryptedSecret = rsa.Decrypt(
+                        encryptedSecret,
+                        RSAEncryptionPadding.OaepSHA256);
+
+                    Console.WriteLine(
+                        $"RSA decrypted: {Encoding.UTF8.GetString(decryptedSecret)}");
+
+                    // Create a digital signature over the article JSON bytes.
+                    byte[] signature = rsa.SignData(
+                        articleBytes,
+                        HashAlgorithmName.SHA256,
+                        RSASignaturePadding.Pss);
+
+                    bool originalIsValid = recipientPublicKey.VerifyData(
+                        articleBytes,
+                        signature,
+                        HashAlgorithmName.SHA256,
+                        RSASignaturePadding.Pss);
+
+                    Console.WriteLine(
+                        $"Original article signature valid: {originalIsValid}");
+
+                    // Change one byte to simulate modification after signing.
+                    byte[] alteredArticleBytes = (byte[])articleBytes.Clone();
+                    alteredArticleBytes[0] ^= 1;
+
+                    bool alteredIsValid = recipientPublicKey.VerifyData(
+                        alteredArticleBytes,
+                        signature,
+                        HashAlgorithmName.SHA256,
+                        RSASignaturePadding.Pss);
+
+                    Console.WriteLine(
+                        $"Altered article signature valid: {alteredIsValid}");
+
+                    CryptographicOperations.ZeroMemory(shortSecret);
+                    CryptographicOperations.ZeroMemory(encryptedSecret);
+                    CryptographicOperations.ZeroMemory(decryptedSecret);
+                    CryptographicOperations.ZeroMemory(signature);
+                    CryptographicOperations.ZeroMemory(alteredArticleBytes);
+                }
+
+                CryptographicOperations.ZeroMemory(articleBytes);
+            }
+            catch (CryptographicException exception)
+            {
+                Console.WriteLine(
+                    $"RSA operation failed: {exception.Message}");
+            }
+            catch (JsonException exception)
+            {
+                Console.WriteLine(
+                    $"Could not serialize article data: {exception.Message}");
+            }
+        }
+    }
+
+
+2. WHAT THE MAIN STEPS MEAN
+---------------------------
+
+RSA.Create(2048)
+    Asks the platform cryptographic provider to create an RSA key pair with a
+    2048-bit modulus. The provider handles secure random generation and the
+    mathematical work.
+
+ExportSubjectPublicKeyInfoPem()
+    Exports the public key in PEM text format. PEM is a text container with
+    BEGIN/END labels around Base64-encoded key bytes. Public keys can generally
+    be shared, but receivers still need to trust that this is the intended key.
+
+ExportPkcs8PrivateKeyPem()
+    Exports the private key in PKCS#8 PEM format. This is sensitive secret
+    material. The demo only reads its length to show it exists; it does not
+    print or save the private key.
+
+ImportFromPem(publicKeyPem)
+    Reads the public-key text into another RSA object. The separate object
+    models the recipient/verifier having only the public key.
+
+Encrypt(..., RSAEncryptionPadding.OaepSHA256)
+    Encrypts shortSecret using the public key with OAEP and SHA-256. Only the
+    matching private key can decrypt it. It is intentionally a short string,
+    not the whole article.
+
+Decrypt(..., RSAEncryptionPadding.OaepSHA256)
+    Uses the private key to recover the short value.
+
+SignData(articleBytes, SHA256, Pss)
+    Hashes the article bytes with SHA-256 and creates an RSA-PSS signature
+    using the private key.
+
+VerifyData(...)
+    Checks the signature using the public key. It returns true if the exact
+    data and signature verify under that key and configuration; false if they
+    do not match.
+
+The article's `Guid`, title, and status are serialized to JSON first. The
+signature covers the resulting bytes, not an abstract object. Both signer and
+verifier must agree on the exact bytes. If they serialize separately, details
+such as property ordering, whitespace, or encoding can change the bytes.
+Signing a saved export's exact bytes avoids that mismatch.
+
+
+3. KEY EXPORT, IMPORT, AND REAL STORAGE
+---------------------------------------
+
+The demo exports PEM so the public key can be imported into a separate RSA
+instance. It also exports private PEM only to show the API and type. A real
+system must not store a private key as ordinary text next to the article or
+commit it to source control.
+
+Production private-key options include a protected platform key store, a
+hardware security module, or a cloud key-management service. The right choice
+depends on deployment, access controls, recovery, and operational policy.
+Use an approved provider and restrict which service identity may sign or
+decrypt.
+
+For a long-lived key, plan:
+    - Who can use it.
+    - How public keys are distributed and trusted.
+    - How key IDs identify the relevant key.
+    - How rotation and old-data verification work.
+    - What happens if a private key is lost or compromised.
+
+PEM is only an encoding/container format. It does not encrypt a private key.
+If a private key is exported, protect it with a secure storage mechanism.
+
+
+4. RSA ENCRYPTION SIZE LIMIT
+----------------------------
+
+RSA-2048 has a 256-byte modulus. With OAEP-SHA256, the maximum plaintext is
+190 bytes. A JSON article export is usually far larger.
+
+Use RSA to encrypt a small random AES key, then use AES-GCM to encrypt the
+article. This is called hybrid encryption and is demonstrated in file 08.
+
+
+5. SIGNATURE CAUTIONS
+---------------------
+
+A valid signature proves that the checked bytes match a signature made by the
+holder of the private key corresponding to the public key used for
+verification. It does not automatically tell you who that holder is. The
+public key must be obtained and validated through a trust mechanism.
+
+The signature only applies to the exact bytes that were signed. If the JSON
+changes through reformatting, property order, encoding, or data edits, verify
+against the original signature may fail even if the meaning appears similar.
+For a file export, signing the exact file bytes is usually straightforward.
+
+Never accept a failed signature as a warning and continue to publish the
+article. Treat it as unverified data.
+
+
+6. COMMON ERRORS
+----------------
+
+CryptographicException can result from a wrong key, unsupported parameters,
+invalid ciphertext, or other cryptographic provider failure. Keep diagnostics
+appropriate to your threat model; avoid turning remote endpoints into
+decryption/signature oracles.
+
+Use the same:
+    - Public/private key pair.
+    - OAEP hash choice for encrypt/decrypt.
+    - Signature hash and signature padding for sign/verify.
+
+Keep encryption and signature APIs conceptually separate. Do not encrypt with
+the private key or call a signature encrypted content.
+
+
+7. SUMMARY
+----------
+
+RSA-2048 can sign article bytes or encrypt a small secret.
+Use OAEP-SHA256 for new RSA encryption and PSS with SHA-256 for signatures.
+Use the public key to encrypt/verify; use the private key to decrypt/sign.
+Trusting a public key and protecting a private key are application duties.
+For large article content, use hybrid AES + RSA rather than direct RSA.

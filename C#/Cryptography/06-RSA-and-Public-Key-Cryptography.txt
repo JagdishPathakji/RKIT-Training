@@ -1,0 +1,254 @@
+RSA AND PUBLIC-KEY CRYPTOGRAPHY
+===============================
+
+This file begins with the problem of sharing a secret, introduces public and
+private keys, and then explains RSA-2048, encryption, and digital signatures.
+The examples refer to knowledge-base article exports.
+
+
+1. THE KEY-SHARING PROBLEM
+--------------------------
+
+AES uses one secret key for both encryption and decryption. That works well
+when one application encrypts and decrypts its own data, but sharing that
+secret with another party creates a problem: how can the parties exchange the
+secret without an eavesdropper obtaining it?
+
+Public-key cryptography uses a related pair of keys:
+
+    Public key  - may be shared with other people or services.
+    Private key - kept secret by its owner.
+
+The keys are mathematically related, but knowing the public key should not
+make it practical to calculate the private key.
+
+RSA is one public-key algorithm. It can be used for encryption and for digital
+signatures, with different operations and padding schemes.
+
+
+2. IMPORTANT TERMS
+------------------
+
+Key pair
+    The public key and matching private key created together.
+
+Public key
+    The part distributed to people who need to encrypt to the owner or verify
+    the owner's signatures. It is not secret, but recipients still need a
+    trustworthy way to know it belongs to the claimed owner.
+
+Private key
+    The secret part that decrypts data sent to its owner or creates signatures.
+    If stolen, an attacker may decrypt protected messages or impersonate the
+    signer. Protect it using a secure key store or hardware-backed service
+    where appropriate.
+
+Modulus
+    A large number inside RSA's key mathematics. The RSA key size is the bit
+    length of the modulus.
+
+RSA-2048
+    RSA with a 2048-bit modulus. This does not mean a 2048-character key or a
+    2048-bit password. RSA-2048 has a 256-byte modulus size. Its security
+    strength is not equivalent to a 2048-bit AES key; comparing bit lengths
+    across algorithms is misleading.
+
+Padding
+    A defined method that adds structure/randomness around RSA's input before
+    the RSA calculation. Raw RSA must not be used directly. Correct padding is
+    essential for security.
+
+Hash
+    A fixed-length digest calculated from data. SHA-256 is commonly used with
+    RSA signatures. A hash is not encryption and cannot be decrypted to get
+    the original content.
+
+Digital signature
+    A value created with a private key over data (usually via a hash). Anyone
+    with the matching public key can check whether the data matches that
+    signature.
+
+Certificate
+    A signed document that connects a public key to an identity or name. RSA
+    keys alone do not prove that a key belongs to a claimed organization.
+
+
+3. RSA ENCRYPTION AND RSA SIGNATURES ARE DIFFERENT
+-------------------------------------------------
+
+Encryption for a recipient:
+
+    Sender encrypts using recipient's public key.
+    Recipient decrypts using their private key.
+
+Signature by an author:
+
+    Author signs using their private key.
+    Verifier checks using author's public key.
+
+Do not describe a signature as “encrypting with the private key.” Signing and
+encryption are different operations with different security properties and
+padding. A signature does not hide the article. RSA encryption does not prove
+who created the encrypted message.
+
+What a valid signature means:
+    The checked data matches a signature made by the holder of the corresponding
+    private key (assuming the public key is the expected one).
+
+What it does not automatically mean:
+    - A particular human personally approved the article.
+    - The key was not stolen.
+    - The article is true or safe.
+    - The public key genuinely belongs to the named signer unless that
+      association is established and trusted.
+
+
+4. HOW RSA WORKS AT A HIGH LEVEL
+--------------------------------
+
+RSA begins by generating two large secret prime numbers. The implementation
+uses them to calculate a public key and a matching private key. The primes
+must remain secret and are not normally exposed to application code.
+
+The public and private values support a mathematical relationship:
+
+    - A public-key operation can be reversed by the matching private key.
+    - A private-key signature operation can be checked by the matching public
+      key.
+
+The exact equations involve modular arithmetic and carefully chosen
+parameters. .NET's cryptographic provider performs these calculations. An
+application developer should use a reviewed library API rather than writing
+RSA mathematics or padding by hand.
+
+RSA security depends on the difficulty of factoring the large modulus back
+into its secret prime factors. Increasing key size makes attacks more
+difficult but also increases operation cost and signature/ciphertext size.
+
+
+5. WHY 2048 BITS, AND WHAT IT DOES NOT MEAN
+------------------------------------------
+
+RSA-2048 is a widely supported baseline for many current applications, subject
+to an organization's security policy and the expected lifetime of the data.
+Some policies require larger keys or different algorithms. Follow current
+organizational and platform guidance for the system's required lifetime.
+
+The modulus is 2048 bits = 256 bytes. Therefore:
+    - An RSA-2048 signature is 256 bytes.
+    - RSA-2048 ciphertext is also 256 bytes.
+    - These lengths are fixed by the modulus size, regardless of plaintext
+      length for ciphertext.
+
+RSA does not encrypt arbitrary amounts of content. With OAEP and SHA-256, the
+maximum message size is:
+
+    modulusBytes - 2 * hashBytes - 2
+    256 - 2 * 32 - 2 = 190 bytes for RSA-2048
+
+That limit is far too small for a normal JSON article. Use RSA to protect a
+small AES key, or use RSA to sign article bytes. Do not try to encrypt a whole
+article with RSA.
+
+
+6. RSA ENCRYPTION PADDING: OAEP
+-------------------------------
+
+OAEP means Optimal Asymmetric Encryption Padding. It is the recommended
+padding family for new RSA encryption designs in .NET.
+
+Use RSA-OAEP with SHA-256 (in .NET: RSAEncryptionPadding.OaepSHA256) where
+compatible. Do not use raw RSA. Avoid PKCS#1 v1.5 encryption for new designs
+unless a legacy protocol requires it and has been reviewed.
+
+RSA encryption is randomized: encrypting the same plaintext twice with the
+same public key and OAEP should normally produce different ciphertexts.
+Ciphertext should be decrypted only by the private key holder.
+
+OAEP solves padding/security problems; it does not make RSA suitable for large
+data. The size limit still applies.
+
+
+7. RSA SIGNATURE PADDING: PSS
+-----------------------------
+
+PSS means Probabilistic Signature Scheme. It is a modern RSA signature padding
+method and a preferred choice for new signatures when both sides support it.
+
+In .NET, use:
+
+    HashAlgorithmName.SHA256
+    RSASignaturePadding.Pss
+
+Signing the article computes a hash and applies a private-key operation to
+produce a signature. Verification checks the signature against the article
+bytes and public key. If even one article byte changes, verification should
+fail.
+
+PKCS#1 v1.5 signatures can be needed for compatibility with older systems.
+This is different from using PKCS#1 v1.5 for encryption. Choose a standard
+scheme for the exact operation; do not interchange encryption and signature
+padding.
+
+
+8. WHEN RSA FITS THE KNOWLEDGE-BASE PROJECT
+-------------------------------------------
+
+Signing:
+    Your service can sign a published article export with its private key.
+    External consumers can verify it with a trusted public key. This helps
+    detect changes and establish that the signer controlled the key.
+
+Confidential delivery:
+    A sender can encrypt a small AES key for a recipient's public key. The
+    recipient decrypts that AES key with the private key and uses AES-GCM for
+    the article. This is hybrid encryption, explained in file 08.
+
+Usually not appropriate:
+    - Encrypting the entire article directly with RSA.
+    - Using RSA to store user passwords.
+    - Assuming any public key presented by a sender belongs to your service.
+    - Using a signature as a replacement for article review approval records.
+
+
+9. PUBLIC KEY TRUST AND IDENTITY
+-------------------------------
+
+A public key is shareable, but a receiver must know it is the right public
+key. If an attacker substitutes their own key and the application accepts it,
+the cryptographic operation can succeed with the attacker's key.
+
+Possible trust mechanisms include:
+    - A public key distributed through a trusted, authenticated channel.
+    - A certificate checked under an accepted certificate authority.
+    - A pinned public key or fingerprint distributed out of band.
+    - A managed enterprise key directory.
+
+A fingerprint is a short display/check value derived from a public key. It
+helps people compare keys but requires a trusted way to exchange the expected
+fingerprint.
+
+
+10. COMMON MISTAKES
+-------------------
+
+- Treating a public key as proof of identity without validating it.
+- Sharing or logging a private key.
+- Using raw RSA or inventing custom padding.
+- Encrypting a long article directly with RSA.
+- Using encryption to claim who authored content.
+- Calling a digital signature encryption.
+- Using the wrong padding for the operation.
+- Assuming RSA-2048 means “2048-bit security.”
+- Assuming a valid signature proves human intent or article correctness.
+- Forgetting how the private key will be backed up, rotated, and recovered.
+
+
+11. MENTAL MODEL
+----------------
+
+RSA creates a pair: share the public key, protect the private key.
+Encrypt to a recipient with their public key; only their private key decrypts.
+Sign with the author's private key; verify with the author's public key.
+RSA is for small data or signatures, not whole article files.
+Trusting the public key is a separate identity problem.

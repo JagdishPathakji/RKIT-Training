@@ -1,0 +1,296 @@
+AES AND SYMMETRIC ENCRYPTION
+============================
+
+This file starts from the basic problem of keeping data secret, then builds up
+to AES and the choices an application developer must make. The examples and
+use cases use knowledge-base article drafts and exports.
+
+
+1. THE SECURITY PROBLEM: WHO CAN READ THE DATA?
+------------------------------------------------
+
+An application may need to save or send an article that should not be readable
+by every person who can obtain the file. Examples include an unpublished draft,
+a private review export, or a backup copied to storage outside the application.
+
+If the application writes ordinary JSON or XML, a person who can open the file
+can read it. Encoding the text as Base64, changing its extension, or making it
+look like random characters is not encryption. Those operations do not require
+a secret to reverse.
+
+Encryption changes readable data into ciphertext using an encryption
+algorithm and a key. Only someone with the right key can recover the original
+data. The original readable data is called plaintext.
+
+Plaintext -- encrypt with key --> ciphertext
+Ciphertext -- decrypt with key --> plaintext
+
+Encryption addresses confidentiality: preventing people without the key from
+reading the content. It does not automatically decide whether the user is
+allowed to access the article, prove a human's identity, or keep the key safe.
+
+
+2. TERMS TO KNOW FIRST
+----------------------
+
+Plaintext
+    The data before encryption. It might be JSON containing an article title,
+    version, review notes, and content blocks.
+
+Ciphertext
+    The encrypted bytes. They are not meaningful article text without the key
+    and the correct decryption process.
+
+Key
+    A value used by the encryption algorithm. A secret encryption key must be
+    kept secret. Losing it can make the encrypted data unrecoverable.
+
+Symmetric encryption
+    Encryption where the same secret key is used to encrypt and decrypt. AES
+    is a symmetric encryption algorithm.
+
+Bit and byte
+    A bit is one binary digit, 0 or 1. A byte contains 8 bits. A 256-bit AES
+    key is 32 bytes long.
+
+Block cipher
+    An encryption algorithm that transforms one fixed-size block of bytes at
+    a time. AES is a block cipher with a block size of 128 bits (16 bytes).
+    Real messages can be longer than one block, so a mode of operation is
+    needed to safely use the block cipher over a whole message.
+
+Mode of operation
+    A method for applying a block cipher to messages. AES by itself handles a
+    16-byte block; a mode defines how a complete message is handled.
+
+Nonce
+    A value used once with an encryption operation. It usually does not need
+    to be secret, but for AES-GCM it must never be reused with the same key.
+
+Authentication tag
+    A short value produced by authenticated encryption. It allows the receiver
+    to detect that the ciphertext or authenticated metadata was changed.
+
+Authenticated data
+    Information that is checked for modification but is not encrypted. In
+    AES-GCM this is called additional authenticated data (AAD). An article ID
+    or format version could be AAD if the application needs it bound to the
+    ciphertext.
+
+
+3. WHAT IS AES?
+---------------
+
+AES means Advanced Encryption Standard. It is a widely used, standardized
+symmetric block cipher. AES was selected from the Rijndael algorithm and
+standardized by NIST.
+
+AES has:
+    - A fixed block size of 128 bits (16 bytes).
+    - Key sizes of 128, 192, or 256 bits.
+
+Rijndael and AES are related but are not identical names for every possible
+configuration. The original Rijndael design allowed multiple block sizes and
+key sizes. AES standardizes Rijndael with a 128-bit block and the three key
+sizes listed above. In everyday .NET application code, request AES by using
+the AES APIs; do not try to implement Rijndael rounds yourself.
+
+The AES key size is not the message size. AES can protect messages much longer
+than 16 bytes because a mode of operation processes multiple blocks or, with
+GCM, generates a stream of encrypted bytes.
+
+
+4. CONFIDENTIALITY IS NOT THE ONLY REQUIREMENT
+----------------------------------------------
+
+Imagine an encrypted article export is changed while stored or sent. A
+decryption-only design may not reliably tell the application that the bytes
+were altered. An attacker might damage or manipulate data and cause confusing
+results.
+
+Modern application encryption should usually provide both:
+
+    Confidentiality: unauthorized readers cannot learn the plaintext.
+    Integrity: modifications are detected.
+
+Authenticated encryption provides both properties together. AES-GCM is an
+example. Its output consists of ciphertext and an authentication tag. Decrypt
+and verify with the same key, nonce, and authenticated data. If verification
+fails, do not use any resulting plaintext.
+
+GCM does not prove which employee or service created the file. Anyone holding
+the AES key can create valid ciphertext and a valid tag. For proof that data
+was signed by a particular private-key holder, use a digital signature such
+as RSA-PSS; see the RSA files.
+
+
+5. AES MODES AND WHY THE MODE MATTERS
+------------------------------------
+
+AES is a block cipher, so an application selects a mode that explains how to
+protect a message. A mode is not an optional cosmetic setting; choosing a
+poor mode can remove security properties that the application expects.
+
+ECB (Electronic Codebook)
+    Encrypts each block independently. Repeated plaintext blocks produce
+    repeated ciphertext blocks, which reveals patterns. Do not use ECB for
+    normal application data.
+
+CBC (Cipher Block Chaining)
+    Combines each plaintext block with the previous ciphertext block. It
+    requires an initialization vector (IV) and padding for messages that are
+    not a multiple of the block size. CBC encryption by itself does not
+    authenticate the data. A separate, carefully designed authentication
+    mechanism is needed. New designs should generally prefer an authenticated
+    encryption mode instead.
+
+GCM (Galois/Counter Mode)
+    Provides authenticated encryption. It encrypts data and creates an
+    authentication tag that is checked during decryption. It does not require
+    padding for arbitrary-length messages.
+
+CTR (Counter Mode)
+    Uses AES to produce a stream-like sequence of bytes, then combines it
+    with plaintext. CTR alone does not authenticate data, and nonce/counter
+    reuse is dangerous. GCM uses counter-mode encryption along with
+    authentication.
+
+For a typical new .NET application needing encryption, use AES-GCM unless a
+specific compatibility or platform requirement calls for another reviewed
+design. Do not select a mode just because it appears in an older example.
+
+
+6. AES-GCM VALUES: KEY, NONCE, CIPHERTEXT, TAG, AAD
+--------------------------------------------------
+
+Key
+    For AES-256, use a cryptographically secure random 32-byte key. The key is
+    secret and must be managed independently of the encrypted file.
+
+Nonce
+    A commonly recommended GCM nonce size is 12 bytes (96 bits). It is
+    normally stored alongside the ciphertext because it is not secret.
+    Generate a fresh nonce for each encryption under a given key. Never reuse
+    a nonce with the same AES-GCM key. Reuse can catastrophically undermine
+    confidentiality and integrity.
+
+Ciphertext
+    The encrypted bytes. Its length is generally the same as the plaintext's
+    length for GCM.
+
+Tag
+    The authentication result. A 16-byte (128-bit) tag is a common choice.
+    Store and transmit it with the ciphertext. If any protected input is
+    changed, tag verification should fail.
+
+AAD (additional authenticated data)
+    Optional, non-secret bytes authenticated along with the message but not
+    encrypted. If used, the same exact AAD must be supplied for decryption.
+    AAD is useful for binding context such as an export schema version. It
+    should be designed consistently; it is not a place for secret values.
+
+A stored encrypted payload therefore needs at least:
+
+    Format version
+    Algorithm/mode identifier
+    Nonce
+    Authentication tag
+    Ciphertext
+    Key identifier or other key-selection information, if the system manages
+    multiple keys
+
+The key itself must NOT be stored beside this payload in an unprotected way.
+
+
+7. HOW AES-GCM WORKS AT A HIGH LEVEL
+------------------------------------
+
+1. The application serializes an article export, for example, into UTF-8 JSON.
+2. It obtains a secret AES key from a key-management mechanism.
+3. It generates a new unique nonce for this encryption.
+4. AES-GCM encrypts the bytes and creates an authentication tag. Optional AAD
+   is authenticated but remains visible.
+5. The application stores or sends the nonce, tag, ciphertext, and required
+   metadata. These values do not have to be secret.
+6. The recipient selects the correct key and supplies the same nonce, tag, and
+   AAD to AES-GCM decryption.
+7. If authentication succeeds, the application can parse the plaintext.
+   If it fails, reject the data and do not parse or use it.
+
+Do not parse unverified ciphertext or treat a failed verification as an empty
+article. Authentication failure is a security-relevant error.
+
+
+8. AES KEY HANDLING
+-------------------
+
+Encryption is only as safe as its key handling. A strong algorithm cannot
+protect data if the key is written into source code or saved beside the file.
+
+For a learning demo:
+    - Generate a random key in memory.
+    - Encrypt and decrypt during the same run.
+    - Explain that the data cannot be decrypted in a later process unless the
+      key is preserved securely.
+    - Never reuse a demo key for real data.
+
+For a real deployment:
+    - Keep keys in an appropriate secret store or key-management service.
+    - Limit which application identities can use a key.
+    - Plan how to rotate keys and identify which key encrypted each payload.
+    - Back up key material according to recovery requirements. Losing the key
+      can mean losing the protected article data.
+    - Do not log secret keys, plaintext private drafts, or credentials.
+
+Key rotation means moving from an older key to a newer one under a planned
+process. Existing data may need to be decrypted with the old key and
+re-encrypted with the new key, or the application may support both keys while
+it migrates data.
+
+
+9. FITTING AES TO THE KNOWLEDGE-BASE PROJECT
+-------------------------------------------
+
+Reasonable possible uses:
+    - Protect a private article export at rest when storage access alone is
+      not an adequate protection boundary.
+    - Protect a backup or offline review package that may be copied outside
+      the application's normal access controls.
+    - Encrypt selected sensitive review information before storing it in a
+      separate store, if the system has a real requirement for that.
+
+Usually not a reason to use AES:
+    - Published public articles that are already meant to be readable.
+    - A replacement for user authentication, database authorization, or
+      network TLS.
+    - A way to store passwords. Passwords need a password-hashing function
+      designed for that purpose, not reversible encryption.
+
+AES can be used for files and JSON/XML exports, but it does not decide which
+article a user may read. Keep authorization in the application/database too.
+
+
+10. COMMON MISTAKES
+-------------------
+
+- Using a hard-coded key or a key committed to source control.
+- Saving the key next to the ciphertext.
+- Reusing an AES-GCM nonce with the same key.
+- Using ECB or unauthenticated CBC for a new design.
+- Forgetting to store the nonce or tag required for later decryption.
+- Supplying a different AAD value when decrypting.
+- Using plaintext after authentication/decryption failed.
+- Assuming AES tells you which user created the ciphertext.
+- Assuming encryption replaces TLS or access control.
+- Using AES to store passwords.
+- Encrypting data without a recovery and key-rotation plan.
+
+
+11. MENTAL MODEL
+----------------
+
+AES is the engine that protects bytes using a secret key.
+AES-GCM is a mode that both hides the bytes and detects modification.
+The nonce and tag travel with the ciphertext; the key does not.
+The application is responsible for key storage, authorization, and deciding
+what data should be encrypted.

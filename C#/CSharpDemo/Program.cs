@@ -21,6 +21,7 @@ using CSharpDemo.Generics;
 using CSharpDemo.BaseLibrary;
 using CSharpDemo.Serialization;
 using CSharpDemo.FileSystem;
+using CSharpDemo.OrmLiteDemo;
 
 class Program {
 
@@ -46,6 +47,7 @@ class Program {
             Console.WriteLine("12-Lambda-Expressions");
             Console.WriteLine("13-Extension-Methods");
             Console.WriteLine("14-LINQ");
+            Console.WriteLine("15-ORMLite");
             Console.WriteLine("17-Dynamic-Type");
             Console.WriteLine("18-CRUD-Database-With-C#");
             Console.WriteLine("19-String-Interpolation");
@@ -97,6 +99,9 @@ class Program {
                         break;
                 case "14":
                         Call14();
+                        break;
+                case "15":
+                        Call15();
                         break;
                 case "17":
                         Call17();
@@ -238,6 +243,103 @@ class Program {
         DataTableDemoLinq.Run();
     }
 
+    static void Call15()
+    {
+        while (true)
+        {
+            ConsoleHelper.Clear();
+            Console.WriteLine("=== ORMLITE DEMO ===");
+            Console.WriteLine("01. Test database connection");
+            Console.WriteLine("02. Insert and InsertOnly examples");
+            Console.WriteLine("03. Save a tag");
+            Console.WriteLine("04. Update a user");
+            Console.WriteLine("05. Select and show mapped tables");
+            Console.WriteLine("06. Delete examples");
+            Console.WriteLine("07. Aggregate examples");
+            Console.WriteLine("08. JOIN examples");
+            Console.WriteLine("09. GROUP BY and HAVING examples");
+            Console.WriteLine("10. Raw SQL tag CRUD");
+            Console.WriteLine("11. Table schema API");
+            Console.WriteLine("0. Return to main menu");
+            Console.Write("Choose: ");
+
+            string? choice = Console.ReadLine();
+            if (choice == "0")
+            {
+                return;
+            }
+
+            try
+            {
+                using var db = KnowledgeBaseConnection.Open();
+
+                switch (choice)
+                {
+                    case "1":
+                    case "01":
+                        Console.WriteLine("Connected to the knowledge_base database.");
+                        break;
+                    case "2":
+                    case "02":
+                        InsertDemo.RunInsert(db);
+                        InsertDemo.RunInsertOnly(db);
+                        break;
+                    case "3":
+                    case "03":
+                        SaveDemo.Run(db);
+                        break;
+                    case "4":
+                    case "04":
+                        UpdateDemo.Run(db);
+                        break;
+                    case "5":
+                    case "05":
+                        SelectDemo.Run(db);
+                        SelectDemo.ShowAllTables(db);
+                        break;
+                    case "6":
+                    case "06":
+                        DeleteDemo.Run(db);
+                        break;
+                    case "7":
+                    case "07":
+                        AggregateDemo.Run(db);
+                        break;
+                    case "8":
+                    case "08":
+                        JoinDemo.Run(db);
+                        break;
+                    case "9":
+                    case "09":
+                        GroupByHavingDemo.Run(db);
+                        break;
+                    case "10":
+                        RawSqlCrudDemo.Run(db);
+                        break;
+                    case "11":
+                        TableSchemaApiDemo.Run(db);
+                        break;
+                    default:
+                        Console.WriteLine("Invalid choice.");
+                        break;
+                }
+            }
+            catch (MySqlException ex) when (ex.Number == 1062)
+            {
+                Console.WriteLine("A record with that unique value already exists.");
+                Console.Error.WriteLine(ex);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("The database demo operation failed.");
+                Console.Error.WriteLine(ex);
+            }
+
+            Console.WriteLine("\nPress any key to continue...");
+            Console.ReadKey(true);
+        }
+    }
+
     static void Call17() {
 
         ConsoleHelper.Clear();
@@ -345,4 +447,5 @@ class Program {
         Console.WriteLine("\nPress any key to return...");
         Console.ReadKey(true);
     }
+
 }

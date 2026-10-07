@@ -8,7 +8,8 @@
     ".NETCoreApp,Version=v10.0": {
       "CSharpDemo/1.0.0": {
         "dependencies": {
-          "MySql.Data": "26.7.0"
+          "MySql.Data": "26.7.0",
+          "ServiceStack.OrmLite.MySql": "10.3.0"
         },
         "runtime": {
           "CSharpDemo.dll": {}
@@ -58,6 +59,14 @@
           }
         }
       },
+      "Microsoft.Extensions.DependencyInjection.Abstractions/8.0.2": {
+        "runtime": {
+          "lib/net8.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll": {
+            "assemblyVersion": "8.0.0.0",
+            "fileVersion": "8.0.1024.46610"
+          }
+        }
+      },
       "MySql.Data/26.7.0": {
         "dependencies": {
           "BouncyCastle.Cryptography": "2.6.2",
@@ -98,6 +107,61 @@
             "rid": "win-x64",
             "assetType": "native",
             "fileVersion": "4.3.0.1"
+          }
+        }
+      },
+      "ServiceStack.Common/10.3.0": {
+        "dependencies": {
+          "ServiceStack.Interfaces": "10.3.0",
+          "ServiceStack.Text": "10.3.0"
+        },
+        "runtime": {
+          "lib/net10.0/ServiceStack.Common.dll": {
+            "assemblyVersion": "6.0.0.0",
+            "fileVersion": "10.3.0.0"
+          }
+        }
+      },
+      "ServiceStack.Interfaces/10.3.0": {
+        "runtime": {
+          "lib/net10.0/ServiceStack.Interfaces.dll": {
+            "assemblyVersion": "6.0.0.0",
+            "fileVersion": "10.3.0.0"
+          }
+        }
+      },
+      "ServiceStack.OrmLite/10.3.0": {
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.2",
+          "ServiceStack.Common": "10.3.0"
+        },
+        "runtime": {
+          "lib/net10.0/ServiceStack.OrmLite.dll": {
+            "assemblyVersion": "6.0.0.0",
+            "fileVersion": "10.3.0.0"
+          }
+        }
+      },
+      "ServiceStack.OrmLite.MySql/10.3.0": {
+        "dependencies": {
+          "MySql.Data": "26.7.0",
+          "ServiceStack.Common": "10.3.0",
+          "ServiceStack.Interfaces": "10.3.0",
+          "ServiceStack.OrmLite": "10.3.0",
+          "ServiceStack.Text": "10.3.0"
+        },
+        "runtime": {
+          "lib/net10.0/ServiceStack.OrmLite.MySql.dll": {
+            "assemblyVersion": "6.0.0.0",
+            "fileVersion": "10.3.0.0"
+          }
+        }
+      },
+      "ServiceStack.Text/10.3.0": {
+        "runtime": {
+          "lib/net10.0/ServiceStack.Text.dll": {
+            "assemblyVersion": "6.0.0.0",
+            "fileVersion": "10.3.0.0"
           }
         }
       },
@@ -221,12 +285,54 @@
       "path": "k4os.hash.xxhash/1.0.8",
       "hashPath": "k4os.hash.xxhash.1.0.8.nupkg.sha512"
     },
+    "Microsoft.Extensions.DependencyInjection.Abstractions/8.0.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-3iE7UF7MQkCv1cxzCahz+Y/guQbTqieyxyaWKhrRO91itI9cOKO76OHeQDahqG4MmW5umr3CcCvGmK92lWNlbg==",
+      "path": "microsoft.extensions.dependencyinjection.abstractions/8.0.2",
+      "hashPath": "microsoft.extensions.dependencyinjection.abstractions.8.0.2.nupkg.sha512"
+    },
     "MySql.Data/26.7.0": {
       "type": "package",
       "serviceable": true,
       "sha512": "sha512-WXk00B5N6TnuTU0SVRFxMAr2nfLj+4T6gY1NPeDdtj8cwy2Rk5v4GIUK9oSiTSMntEdrKeaYG4eyYPjZun7D7w==",
       "path": "mysql.data/26.7.0",
       "hashPath": "mysql.data.26.7.0.nupkg.sha512"
+    },
+    "ServiceStack.Common/10.3.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-ybqAadWMfx+zAZDRSGVZNphIVg+8IQxczZiwq3egRgr+4KHBmL7oHPcpdQCnxqkXzmG0mhmA3mJtP5M/gEKPOw==",
+      "path": "servicestack.common/10.3.0",
+      "hashPath": "servicestack.common.10.3.0.nupkg.sha512"
+    },
+    "ServiceStack.Interfaces/10.3.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-zw/YP04219zlKLn6Ma/Acie3Dx7E/D9Iw/1p5bK1dnZmJAIzkrqwEfL42eLAtaSB93yBLHxjL05AHN2y14xJuQ==",
+      "path": "servicestack.interfaces/10.3.0",
+      "hashPath": "servicestack.interfaces.10.3.0.nupkg.sha512"
+    },
+    "ServiceStack.OrmLite/10.3.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-hWL53mR3258PnNvB9+xzk1pnsUmjL9y5VkAL6UruqK2vaq4sRpSPRzDIXimHvNQ+hPqtZM6UrWGjGVfinRcggw==",
+      "path": "servicestack.ormlite/10.3.0",
+      "hashPath": "servicestack.ormlite.10.3.0.nupkg.sha512"
+    },
+    "ServiceStack.OrmLite.MySql/10.3.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-0gkwMoEUkhy2nZBxqajnZDp1I9YQSLQPscrq3rIak8bMzQVR1PEYyvydvapeeMJU9WC0iJjNRBXWXPGYDmTBXQ==",
+      "path": "servicestack.ormlite.mysql/10.3.0",
+      "hashPath": "servicestack.ormlite.mysql.10.3.0.nupkg.sha512"
+    },
+    "ServiceStack.Text/10.3.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-6Zct9EX/izIbI11Wlwsb/4xlCuRRnFhXu2tt9+XD0mzLTeHjbaX/3GXiGHojJ5iYELYd3cUCdf3D8lAbIQyjDQ==",
+      "path": "servicestack.text/10.3.0",
+      "hashPath": "servicestack.text.10.3.0.nupkg.sha512"
     },
     "System.Configuration.ConfigurationManager/10.0.8": {
       "type": "package",

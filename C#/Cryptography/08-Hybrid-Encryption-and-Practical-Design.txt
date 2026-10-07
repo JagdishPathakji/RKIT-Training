@@ -1,0 +1,392 @@
+HYBRID ENCRYPTION AND PRACTICAL DESIGN
+======================================
+
+This file combines AES and RSA into a practical design for sending a
+confidential knowledge-base article export to a recipient. It also explains
+which problem this design solves, what it does not solve, and the decisions a
+real system must make.
+
+
+1. WHY COMBINE AES AND RSA?
+---------------------------
+
+AES is fast and can encrypt an article of any practical size. However, sender
+and recipient must both have the same AES key. RSA has a public/private key
+pair that helps solve delivery of a small secret, but RSA can encrypt only a
+small amount of data.
+
+Hybrid encryption uses both:
+
+    1. Generate a random AES key for one package.
+    2. Encrypt the article with AES-GCM.
+    3. Encrypt (wrap) the AES key using the recipient's RSA public key and
+       OAEP-SHA256.
+    4. Send the encrypted AES key and AES-GCM envelope together.
+    5. Recipient uses their RSA private key to recover the AES key.
+    6. Recipient uses AES-GCM to authenticate and decrypt the article.
+
+The term "wrap" here means encrypting a small key so it can be delivered
+securely. The recipient's private key is never sent.
+
+
+2. WHAT IS SENT?
+----------------
+
+An example package contains:
+
+    FormatVersion
+    RecipientKeyId
+    Algorithm identifiers
+    AES nonce
+    AES authentication tag
+    Ciphertext
+    RSA-encrypted AES key
+
+The key ID helps the recipient select the correct private key, especially
+during key rotation. It is not itself secret.
+
+The nonce, tag, ciphertext, and wrapped AES key can be stored together. The
+article remains confidential because the AES key is not present in plaintext.
+
+Do not create a custom cryptographic file format casually. Real formats need
+versioning, strict validation, clear algorithm identifiers, and a review of
+which metadata must be authenticated. The example below is a teaching format,
+not an interoperability standard.
+
+
+3. COMPLETE C# EXAMPLE
+----------------------
+
+The following code builds and consumes one hybrid package in memory during a
+single run. It demonstrates the cryptographic flow without saving private keys
+or exposing a real key-management pattern. Both key pairs are generated at
+runtime, so the demo only works within that run.
+
+    using System;
+    using System.Security.Cryptography;
+    using System.Text;
+    using System.Text.Json;
+
+    namespace CSharpDemo.Cryptography;
+
+    public class ArticleForHybridDemo
+    {
+        public Guid ArticleId { get; set; }
+        public Guid AuthorId { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public string Title { get; set; } = "";
+        public string Status { get; set; } = "";
+        public string[] Tags { get; set; } = Array.Empty<string>();
+    }
+
+    public class HybridArticlePackage
+    {
+        public int FormatVersion { get; set; }
+        public string RecipientKeyId { get; set; } = "";
+        public string WrappedAesKey { get; set; } = "";
+        public string Nonce { get; set; } = "";
+        public string AuthenticationTag { get; set; } = "";
+        public string Ciphertext { get; set; } = "";
+    }
+
+    public static class HybridArticleDemo
+    {
+        private const int AesKeyLength = 32;
+        private const int NonceLength = 12;
+        private const int TagLength = 16;
+
+        public static void Run()
+        {
+            byte[] aesKey = RandomNumberGenerator.GetBytes(AesKeyLength);
+            byte[]? plaintext = null;
+
+            try
+            {
+                ArticleForHybridDemo article = new ArticleForHybridDemo
+                {
+                    ArticleId = Guid.NewGuid(),
+                    AuthorId = Guid.NewGuid(),
+                    CreatedAt = new DateTime(
+                        2026, 10, 7, 10, 0, 0, DateTimeKind.Utc),
+                    Title = "A Practical Guide to Database Indexes",
+                    Status = "PrivateReview",
+                    Tags = new[] { "database", "performance" }
+                };
+
+                plaintext = Encoding.UTF8.GetBytes(
+                    JsonSerializer.Serialize(article));
+
+                byte[] nonce = RandomNumberGenerator.GetBytes(NonceLength);
+                byte[] ciphertext = new byte[plaintext.Length];
+                byte[] tag = new byte[TagLength];
+
+                using (AesGcm aes = new AesGcm(aesKey, TagLength))
+                {
+                    aes.Encrypt(nonce, plaintext, ciphertext, tag);
+                }
+
+                using RSA recipientRsa = RSA.Create(2048);
+
+                // In a real system, the recipient's public key comes from a
+                // trusted key/certificate source, not from the sender.
+                string recipientPublicKeyPem =
+                    recipientRsa.ExportSubjectPublicKeyInfoPem();
+
+                using RSA senderViewOfPublicKey = RSA.Create();
+                senderViewOfPublicKey.ImportFromPem(recipientPublicKeyPem);
+
+                byte[] wrappedAesKey = senderViewOfPublicKey.Encrypt(
+                    aesKey,
+                    RSAEncryptionPadding.OaepSHA256);
+
+                HybridArticlePackage package = new HybridArticlePackage
+                {
+                    FormatVersion = 1,
+                    RecipientKeyId = "demo-recipient-key-2026",
+                    WrappedAesKey = Convert.ToBase64String(wrappedAesKey),
+                    Nonce = Convert.ToBase64String(nonce),
+                    AuthenticationTag = Convert.ToBase64String(tag),
+                    Ciphertext = Convert.ToBase64String(ciphertext)
+                };
+
+                string packageJson = JsonSerializer.Serialize(
+                    package,
+                    new JsonSerializerOptions { WriteIndented = true });
+
+                Console.WriteLine("Hybrid encrypted package:");
+                Console.WriteLine(packageJson);
+
+                // Recipient opens the package with their private key.
+                byte[] receivedWrappedKey =
+                    Convert.FromBase64String(package.WrappedAesKey);
+                byte[] receivedNonce =
+                    Convert.FromBase64String(package.Nonce);
+                byte[] receivedTag =
+                    Convert.FromBase64String(package.AuthenticationTag);
+                byte[] receivedCiphertext =
+                    Convert.FromBase64String(package.Ciphertext);
+
+                byte[] recoveredAesKey = recipientRsa.Decrypt(
+                    receivedWrappedKey,
+                    RSAEncryptionPadding.OaepSHA256);
+
+                byte[] recoveredPlaintext = new byte[receivedCiphertext.Length];
+
+                try
+                {
+                    using (AesGcm aes = new AesGcm(recoveredAesKey, TagLength))
+                    {
+                        aes.Decrypt(
+                            receivedNonce,
+                            receivedCiphertext,
+                            receivedTag,
+                            recoveredPlaintext);
+                    }
+
+                    ArticleForHybridDemo restoredArticle =
+                        JsonSerializer.Deserialize<ArticleForHybridDemo>(
+                            Encoding.UTF8.GetString(recoveredPlaintext))
+                        ?? throw new JsonException(
+                            "Decrypted data did not contain an article.");
+
+                    Console.WriteLine("\nRecipient recovered the article:");
+                    Console.WriteLine($"Title: {restoredArticle.Title}");
+                    Console.WriteLine($"Status: {restoredArticle.Status}");
+                    Console.WriteLine($"Tags: {string.Join(", ", restoredArticle.Tags)}");
+                }
+                finally
+                {
+                    CryptographicOperations.ZeroMemory(recoveredAesKey);
+                    CryptographicOperations.ZeroMemory(recoveredPlaintext);
+                    CryptographicOperations.ZeroMemory(receivedWrappedKey);
+                    CryptographicOperations.ZeroMemory(receivedNonce);
+                    CryptographicOperations.ZeroMemory(receivedTag);
+                    CryptographicOperations.ZeroMemory(receivedCiphertext);
+                    CryptographicOperations.ZeroMemory(wrappedAesKey);
+                    CryptographicOperations.ZeroMemory(ciphertext);
+                    CryptographicOperations.ZeroMemory(tag);
+                    CryptographicOperations.ZeroMemory(nonce);
+                }
+            }
+            catch (CryptographicException exception)
+            {
+                Console.WriteLine(
+                    $"Hybrid encryption/decryption failed: {exception.Message}");
+            }
+            catch (JsonException exception)
+            {
+                Console.WriteLine($"Article JSON failed: {exception.Message}");
+            }
+            catch (FormatException exception)
+            {
+                Console.WriteLine($"Package Base64 is invalid: {exception.Message}");
+            }
+            finally
+            {
+                CryptographicOperations.ZeroMemory(aesKey);
+
+                if (plaintext != null)
+                {
+                    CryptographicOperations.ZeroMemory(plaintext);
+                }
+            }
+        }
+    }
+
+
+4. STEP-BY-STEP FLOW
+--------------------
+
+Create article object
+    The example creates a small article DTO. A DTO is a data transfer object:
+    a class shaped for moving data between parts of a system. It is not the
+    database itself.
+
+Serialize JSON and encode UTF-8
+    JSON is a text representation; AES APIs encrypt bytes. UTF-8 turns the
+    JSON characters into bytes.
+
+Generate AES key
+    RandomNumberGenerator creates 32 random bytes (256 bits). This is the
+    content-encryption key and must remain secret.
+
+Encrypt with AES-GCM
+    AES-GCM protects the article bytes, returning ciphertext and an
+    authentication tag. A 12-byte nonce is generated for this encryption.
+
+Encrypt the AES key with recipient RSA public key
+    RSA-OAEP-SHA256 protects the small AES key. The article itself is too big
+    for RSA, which is why AES performs the bulk encryption.
+
+Package values
+    Base64 turns binary values into JSON-friendly strings. Base64 does not
+    make those values secret. The AES key is not included in the package.
+
+Recipient recovers AES key
+    The recipient uses their private key and OAEP-SHA256 to decrypt the
+    wrapped key.
+
+Recipient authenticates and decrypts the article
+    AES-GCM checks the tag and decrypts. If authentication fails, reject the
+    package. Only after successful decryption should the application parse
+    and validate the article JSON.
+
+
+5. IMPORTANT LIMITATIONS OF THE DEMO
+------------------------------------
+
+The recipient's RSA key pair is generated in the same process as the sender's
+work. This is for teaching the flow. In a real system:
+    - The recipient creates and protects their own private key.
+    - The sender obtains the recipient's public key from a trusted source.
+    - The sender must verify that the public key really belongs to the
+      intended recipient.
+    - A recipient key ID identifies which private key should be tried.
+    - The private key must remain available for as long as the recipient must
+      decrypt retained packages.
+
+This example has no signature from the sender. AES-GCM means a holder of the
+AES key can create a valid package, and anyone with the recipient's public key
+can create a new wrapped AES key. It does not prove which sender prepared the
+article. If the recipient also needs to verify that the knowledge-base
+service signed the exact article package, add a digital signature (for
+example, RSA-PSS using the service's signing private key) and verify it using
+the service's trusted public key.
+
+Do not assume that encryption provides replay protection. A replay is the
+resending of a previously valid package. If the application must reject stale
+or duplicate submissions, include authenticated message IDs/timestamps and
+track which have already been accepted.
+
+The package fields should be validated: supported format version, expected
+nonce and tag sizes, acceptable ciphertext length, known recipient key ID,
+and valid Base64. The sample is not a general-purpose file format.
+
+
+6. AES VS RSA VS HMAC: CHOOSE BY THE REQUIREMENT
+------------------------------------------------
+
+AES-GCM
+    Use when the application and recipient can safely obtain the same secret
+    key and need confidentiality plus tamper detection.
+
+RSA-OAEP
+    Use to protect a small secret (such as an AES key) for the holder of the
+    matching private key. Not for large article files.
+
+RSA-PSS signature
+    Use when others need to verify that exact bytes were signed by a holder of
+    the corresponding private key. It does not hide the article.
+
+HMAC-SHA-256
+    Use when both parties share a secret and need message integrity and
+    shared-secret authentication. It does not hide the message and does not
+    distinguish which party holding the shared secret generated the MAC.
+
+Passwords
+    Store using a dedicated password-hashing scheme such as ASP.NET Core
+    Identity's PasswordHasher, not AES, RSA, or a fast general-purpose hash.
+
+
+7. KEY STORAGE AND OPERATIONAL DESIGN
+-------------------------------------
+
+Cryptography needs key lifecycle design:
+
+Creation
+    Generate keys using approved cryptographic APIs or a managed key service.
+
+Use
+    Give each application/service identity only the ability it needs. A web
+    service that only encrypts to recipients may need public keys, not their
+    private keys.
+
+Storage
+    Store private and symmetric keys in a protected key store or key-management
+    service. Do not store secrets in source code, public files, logs, or next
+    to ciphertext without protection.
+
+Rotation
+    Replace keys on a planned schedule or after suspected exposure. Record
+    non-secret key identifiers in packages so the correct key can be selected.
+    Existing data may require old keys until it has been decrypted and
+    re-encrypted.
+
+Recovery
+    Decide how authorized recovery works. If the only decryption key is lost,
+    encrypted article exports may be permanently unreadable.
+
+Compromise
+    A private key compromise can allow decryption of data encrypted to it or
+    signatures made with it to be forged. Revoke/retire the key, identify
+    affected packages, and follow the incident process.
+
+
+8. DESIGN CHECKLIST FOR AN ARTICLE EXPORT
+-----------------------------------------
+
+Before encrypting an export, answer:
+
+1. What data must be confidential, and from whom?
+2. Is the data already protected by database access control and transport TLS?
+3. Is the export for one recipient or for the same application to reopen later?
+4. Who creates and protects the AES/RSA keys?
+5. How does the sender obtain and validate the recipient public key?
+6. How will nonce uniqueness be guaranteed under each AES key?
+7. Which exact bytes are signed, if a signature is required?
+8. How are key IDs, format versions, rotation, and recovery handled?
+9. What input sizes and fields are accepted?
+10. What should happen on any failed authentication, decryption, or signature?
+
+
+9. FINAL MENTAL MODEL
+---------------------
+
+AES-GCM encrypts the large article and detects changes.
+RSA-OAEP encrypts the small AES key for the intended recipient.
+The recipient's private RSA key unlocks the AES key; AES-GCM then opens the
+article.
+An optional RSA-PSS signature answers a different question: did a trusted
+private-key holder sign these exact bytes?
+Keys, recipient identity, access control, replay handling, and recovery remain
+application responsibilities.

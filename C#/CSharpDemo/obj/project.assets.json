@@ -71,6 +71,22 @@
           }
         }
       },
+      "Microsoft.Extensions.DependencyInjection.Abstractions/8.0.2": {
+        "type": "package",
+        "compile": {
+          "lib/net8.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net6.0/_._": {}
+        }
+      },
       "MySql.Data/26.7.0": {
         "type": "package",
         "dependencies": {
@@ -111,6 +127,82 @@
           "runtimes/win-x64/native/krbcc64.dll": {
             "assetType": "native",
             "rid": "win-x64"
+          }
+        }
+      },
+      "ServiceStack.Common/10.3.0": {
+        "type": "package",
+        "dependencies": {
+          "ServiceStack.Interfaces": "10.3.0",
+          "ServiceStack.Text": "10.3.0"
+        },
+        "compile": {
+          "lib/net10.0/ServiceStack.Common.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/ServiceStack.Common.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "ServiceStack.Interfaces/10.3.0": {
+        "type": "package",
+        "compile": {
+          "lib/net10.0/ServiceStack.Interfaces.dll": {}
+        },
+        "runtime": {
+          "lib/net10.0/ServiceStack.Interfaces.dll": {}
+        }
+      },
+      "ServiceStack.OrmLite/10.3.0": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.2",
+          "ServiceStack.Common": "10.3.0"
+        },
+        "compile": {
+          "lib/net10.0/ServiceStack.OrmLite.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/ServiceStack.OrmLite.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "ServiceStack.OrmLite.MySql/10.3.0": {
+        "type": "package",
+        "dependencies": {
+          "MySql.Data": "26.7.0",
+          "ServiceStack.Common": "10.3.0",
+          "ServiceStack.Interfaces": "10.3.0",
+          "ServiceStack.OrmLite": "10.3.0",
+          "ServiceStack.Text": "10.3.0"
+        },
+        "compile": {
+          "lib/net10.0/ServiceStack.OrmLite.MySql.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/ServiceStack.OrmLite.MySql.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "ServiceStack.Text/10.3.0": {
+        "type": "package",
+        "compile": {
+          "lib/net10.0/ServiceStack.Text.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/ServiceStack.Text.dll": {
+            "related": ".xml"
           }
         }
       },
@@ -332,6 +424,38 @@
         "lib/netstandard2.1/K4os.Hash.xxHash.xml"
       ]
     },
+    "Microsoft.Extensions.DependencyInjection.Abstractions/8.0.2": {
+      "sha512": "3iE7UF7MQkCv1cxzCahz+Y/guQbTqieyxyaWKhrRO91itI9cOKO76OHeQDahqG4MmW5umr3CcCvGmK92lWNlbg==",
+      "type": "package",
+      "path": "microsoft.extensions.dependencyinjection.abstractions/8.0.2",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "LICENSE.TXT",
+        "PACKAGE.md",
+        "THIRD-PARTY-NOTICES.TXT",
+        "buildTransitive/net461/Microsoft.Extensions.DependencyInjection.Abstractions.targets",
+        "buildTransitive/net462/_._",
+        "buildTransitive/net6.0/_._",
+        "buildTransitive/netcoreapp2.0/Microsoft.Extensions.DependencyInjection.Abstractions.targets",
+        "lib/net462/Microsoft.Extensions.DependencyInjection.Abstractions.dll",
+        "lib/net462/Microsoft.Extensions.DependencyInjection.Abstractions.xml",
+        "lib/net6.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll",
+        "lib/net6.0/Microsoft.Extensions.DependencyInjection.Abstractions.xml",
+        "lib/net7.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll",
+        "lib/net7.0/Microsoft.Extensions.DependencyInjection.Abstractions.xml",
+        "lib/net8.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll",
+        "lib/net8.0/Microsoft.Extensions.DependencyInjection.Abstractions.xml",
+        "lib/netstandard2.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll",
+        "lib/netstandard2.0/Microsoft.Extensions.DependencyInjection.Abstractions.xml",
+        "lib/netstandard2.1/Microsoft.Extensions.DependencyInjection.Abstractions.dll",
+        "lib/netstandard2.1/Microsoft.Extensions.DependencyInjection.Abstractions.xml",
+        "microsoft.extensions.dependencyinjection.abstractions.8.0.2.nupkg.sha512",
+        "microsoft.extensions.dependencyinjection.abstractions.nuspec",
+        "useSharedDesignerContext.txt"
+      ]
+    },
     "MySql.Data/26.7.0": {
       "sha512": "WXk00B5N6TnuTU0SVRFxMAr2nfLj+4T6gY1NPeDdtj8cwy2Rk5v4GIUK9oSiTSMntEdrKeaYG4eyYPjZun7D7w==",
       "type": "package",
@@ -365,6 +489,100 @@
         "runtimes/win-x64/native/k5sprt64.dll",
         "runtimes/win-x64/native/krb5_64.dll",
         "runtimes/win-x64/native/krbcc64.dll"
+      ]
+    },
+    "ServiceStack.Common/10.3.0": {
+      "sha512": "ybqAadWMfx+zAZDRSGVZNphIVg+8IQxczZiwq3egRgr+4KHBmL7oHPcpdQCnxqkXzmG0mhmA3mJtP5M/gEKPOw==",
+      "type": "package",
+      "path": "servicestack.common/10.3.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net10.0/ServiceStack.Common.dll",
+        "lib/net10.0/ServiceStack.Common.xml",
+        "lib/net472/ServiceStack.Common.dll",
+        "lib/net472/ServiceStack.Common.xml",
+        "lib/net6.0/ServiceStack.Common.dll",
+        "lib/net6.0/ServiceStack.Common.xml",
+        "lib/net8.0/ServiceStack.Common.dll",
+        "lib/net8.0/ServiceStack.Common.xml",
+        "servicestack.common.10.3.0.nupkg.sha512",
+        "servicestack.common.nuspec"
+      ]
+    },
+    "ServiceStack.Interfaces/10.3.0": {
+      "sha512": "zw/YP04219zlKLn6Ma/Acie3Dx7E/D9Iw/1p5bK1dnZmJAIzkrqwEfL42eLAtaSB93yBLHxjL05AHN2y14xJuQ==",
+      "type": "package",
+      "path": "servicestack.interfaces/10.3.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net10.0/ServiceStack.Interfaces.dll",
+        "lib/net472/ServiceStack.Interfaces.dll",
+        "lib/net6.0/ServiceStack.Interfaces.dll",
+        "lib/net8.0/ServiceStack.Interfaces.dll",
+        "lib/netstandard2.0/ServiceStack.Interfaces.dll",
+        "servicestack.interfaces.10.3.0.nupkg.sha512",
+        "servicestack.interfaces.nuspec"
+      ]
+    },
+    "ServiceStack.OrmLite/10.3.0": {
+      "sha512": "hWL53mR3258PnNvB9+xzk1pnsUmjL9y5VkAL6UruqK2vaq4sRpSPRzDIXimHvNQ+hPqtZM6UrWGjGVfinRcggw==",
+      "type": "package",
+      "path": "servicestack.ormlite/10.3.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net10.0/ServiceStack.OrmLite.dll",
+        "lib/net10.0/ServiceStack.OrmLite.xml",
+        "lib/net472/ServiceStack.OrmLite.dll",
+        "lib/net472/ServiceStack.OrmLite.xml",
+        "lib/net6.0/ServiceStack.OrmLite.dll",
+        "lib/net6.0/ServiceStack.OrmLite.xml",
+        "lib/net8.0/ServiceStack.OrmLite.dll",
+        "lib/net8.0/ServiceStack.OrmLite.xml",
+        "servicestack.ormlite.10.3.0.nupkg.sha512",
+        "servicestack.ormlite.nuspec"
+      ]
+    },
+    "ServiceStack.OrmLite.MySql/10.3.0": {
+      "sha512": "0gkwMoEUkhy2nZBxqajnZDp1I9YQSLQPscrq3rIak8bMzQVR1PEYyvydvapeeMJU9WC0iJjNRBXWXPGYDmTBXQ==",
+      "type": "package",
+      "path": "servicestack.ormlite.mysql/10.3.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net10.0/ServiceStack.OrmLite.MySql.dll",
+        "lib/net10.0/ServiceStack.OrmLite.MySql.xml",
+        "lib/net472/ServiceStack.OrmLite.MySql.dll",
+        "lib/net472/ServiceStack.OrmLite.MySql.xml",
+        "lib/net6.0/ServiceStack.OrmLite.MySql.dll",
+        "lib/net6.0/ServiceStack.OrmLite.MySql.xml",
+        "lib/net8.0/ServiceStack.OrmLite.MySql.dll",
+        "lib/net8.0/ServiceStack.OrmLite.MySql.xml",
+        "servicestack.ormlite.mysql.10.3.0.nupkg.sha512",
+        "servicestack.ormlite.mysql.nuspec"
+      ]
+    },
+    "ServiceStack.Text/10.3.0": {
+      "sha512": "6Zct9EX/izIbI11Wlwsb/4xlCuRRnFhXu2tt9+XD0mzLTeHjbaX/3GXiGHojJ5iYELYd3cUCdf3D8lAbIQyjDQ==",
+      "type": "package",
+      "path": "servicestack.text/10.3.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net10.0/ServiceStack.Text.dll",
+        "lib/net10.0/ServiceStack.Text.xml",
+        "lib/net472/ServiceStack.Text.dll",
+        "lib/net472/ServiceStack.Text.xml",
+        "lib/net6.0/ServiceStack.Text.dll",
+        "lib/net6.0/ServiceStack.Text.xml",
+        "lib/net8.0/ServiceStack.Text.dll",
+        "lib/net8.0/ServiceStack.Text.xml",
+        "lib/netstandard2.0/ServiceStack.Text.dll",
+        "lib/netstandard2.0/ServiceStack.Text.xml",
+        "servicestack.text.10.3.0.nupkg.sha512",
+        "servicestack.text.nuspec"
       ]
     },
     "System.Configuration.ConfigurationManager/10.0.8": {
@@ -547,7 +765,8 @@
   },
   "projectFileDependencyGroups": {
     "net10.0": [
-      "MySql.Data >= 26.7.0"
+      "MySql.Data >= 26.7.0",
+      "ServiceStack.OrmLite.MySql >= 10.3.0"
     ]
   },
   "packageFolders": {
@@ -605,6 +824,10 @@
           "MySql.Data": {
             "target": "Package",
             "version": "[26.7.0, )"
+          },
+          "ServiceStack.OrmLite.MySql": {
+            "target": "Package",
+            "version": "[10.3.0, )"
           }
         },
         "imports": [
